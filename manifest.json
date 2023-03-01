@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "ReqMD",
+  "description": "Make http requests straight from your md files",
+  "version": "1.0",
+  "icons": {
+    "16": "public/Log1.png",
+    "32": "public/Log1@2x.png",
+    "48": "public/Log1@3x.png"
+  },
+  "background": {
+    "service_worker": "dist/src/pages/background/index.js"
+  },
+  "action": {
+    "default_icon": {
+      "16": "public/Log1.png",
+      "32": "public/Log1@2x.png",
+      "48": "public/Log1@3x.png"
+    }
+  },
+  "permissions": ["activeTab", "scripting"]
+}
