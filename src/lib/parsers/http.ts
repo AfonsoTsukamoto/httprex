@@ -4,14 +4,14 @@
 
 import { Parser, ParserRequest, ParserError, Method, ParserErrorType, Request, ContentType } from '../parser';
 import { getHeaderContentType, findContentTypeHeader } from '../content-type';
+import { convertBody } from './body-helpers';
+import { EOL_R } from '@src/constants';
 
 enum ParseState {
   URL,
   Header,
   Body,
 }
-
-const EOL = /\r?\n/;
 
 const REMOVE_HEADERS = [
   'content-length'
@@ -28,8 +28,7 @@ export class HTTPParser implements Parser {
   parse(text: string) {
     // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
     // split the request raw text into lines
-    const lines: string[] = text.split(EOL)
-    console.log({ lines, EOL });
+    const lines: string[] = text.split(EOL_R)
     const requestLines: string[] = [];
     const headersLines: string[] = [];
     const bodyLines: string[] = [];
@@ -77,10 +76,11 @@ export class HTTPParser implements Parser {
     const headers = this.parseRequestHeaders(headersLines, requestLine.url);
 
     // parse body lines
-    const contentTypeHeader = getHeaderContentType(findContentTypeHeader(headers));
-    let body = this.parseBody(bodyLines, contentTypeHeader || this.defaultContentType);
+    const contentType: ContentType = getHeaderContentType(findContentTypeHeader(headers)) || this.defaultContentType;
+    let body = this.parseBody(bodyLines, contentType);
 
-    return { ...requestLine, headers, body, body_raw: bodyLines.join('\n'), }
+    body = convertBody(contentType, body ?? "");
+    return { ...requestLine, headers, body }
   }
 
 

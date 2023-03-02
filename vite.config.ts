@@ -1,24 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { resolve } from 'path';
-
-
-const root = resolve(__dirname, 'src');
-const pagesDir = resolve(root, 'pages');
-const assetsDir = resolve(root, 'assets');
-const outDir = resolve(__dirname, 'dist');
-const publicDir = resolve(__dirname, 'public');
+import { root, pagesDir, assetsDir, outDir, publicDir, sharedConfig } from './vite.shared';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  ...sharedConfig,
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@src': root,
-      '@assets': assetsDir,
-      '@pages': pagesDir,
-    },
-  },
   publicDir,
   build: {
     outDir,

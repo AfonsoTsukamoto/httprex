@@ -1,8 +1,8 @@
 import { assert, expect, test } from 'vitest'
 import { HTTPParser } from './http';
 
-const HTTP_POST =
-`POST https://example.com/comments HTTP/1.1
+const JSON_POST =
+`POST https://examples.com/comments HTTP/1.1
 content-type: application/json
 
 {
@@ -10,24 +10,44 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }`;
 
+const FORM_URL_ENCODED_POST =
+`POST https://examples.com/comments HTTP/1.1
+content-type: application/x-www-form-urlencoded
+
+name=sample
+something=else
+what=cool
+time=Wed, 21 Oct 2015 18:27:50 GMT
+`;
+
+
+
 describe('http parser', () => {
-  test('parses POST', () => {
+  test('parses JSON POST', () => {
     const p = new HTTPParser();
     console.log(p);
-    expect(p.parse(HTTP_POST)).toBe({
-      "body": `{
-      "name": "sample",
-      "time": "Wed, 21 Oct 2015 18:27:50 GMT"
-    }`,
-      "body_raw": `{
-      "name": "sample",
-      "time": "Wed, 21 Oct 2015 18:27:50 GMT"
-    }`,
+    expect(p.parse(JSON_POST)).toStrictEqual({
+      "body": {
+        "name": "sample",
+        "time": "Wed, 21 Oct 2015 18:27:50 GMT",
+      },
       "headers": {
         "content-type": "application/json",
       },
       "method": "POST",
-      "url": "https://example.com/comments"
+      "url": "https://examples.com/comments",
     });
+  });
+  test('parses x-www-form-urlencoded POST', () => {
+    const p = new HTTPParser();
+    console.log(p);
+    expect(p.parse(FORM_URL_ENCODED_POST)).toStrictEqual({
+      "body": "name=sample&something=else&what=cool&time=Wed%252C%252021%2520Oct%25202015%252018%253A27%253A50%2520GMT&=undefined",
+      "headers": {
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      "method": "POST",
+      "url": "https://examples.com/comments",
+    })
   });
 });
