@@ -9,7 +9,6 @@ chrome.runtime.onInstalled.addListener(() => {
 const detectCode = () => {
   const els = document.getElementsByClassName("highlight-source-js");
   const code = document.createElement("p");
-  console.log({ det: els });
   code.textContent = "CODE FOUND";
   code.classList.add("code-found")
   for (let el of els) {
