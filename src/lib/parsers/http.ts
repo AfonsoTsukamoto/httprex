@@ -67,7 +67,6 @@ export class HTTPParser implements Parser {
           break;
       }
     }
-    console.log({ requestLines, headersLines, bodyLines, variableLines });
 
     // parse request line
     const requestLine = this.parseRequestLine(requestLines.map(l => l.trim()).join(''));
@@ -92,7 +91,6 @@ export class HTTPParser implements Parser {
     let match: Nullable<RegExpExecArray> = this.methodRegex.exec(line);
     if (match) {
       method = match[1];
-      console.log({line, method, len: match[1].length});
       url = line.substring(match[1].length);
     } else {
       // Only provides request url
@@ -103,7 +101,6 @@ export class HTTPParser implements Parser {
 
     let headerMatch: Nullable<RegExpExecArray> = this.httpVersionRegex.exec(url);
     if (headerMatch) {
-      console.log({ headerMatch, url });
       url = url.substring(0, headerMatch.index);
     }
 

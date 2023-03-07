@@ -29,8 +29,6 @@ export const convertFormURLEncoded = (content: string) => {
     },
     []
   );
-  console.log({ content, lines, kvs });
-
   return new URLSearchParams(kvs).toString();
 };
 

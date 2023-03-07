@@ -25,7 +25,6 @@ time=Wed, 21 Oct 2015 18:27:50 GMT
 describe('http parser', () => {
   test('parses JSON POST', () => {
     const p = new HTTPParser();
-    console.log(p);
     expect(p.parse(JSON_POST)).toStrictEqual({
       "body": {
         "name": "sample",
@@ -40,7 +39,6 @@ describe('http parser', () => {
   });
   test('parses x-www-form-urlencoded POST', () => {
     const p = new HTTPParser();
-    console.log(p);
     expect(p.parse(FORM_URL_ENCODED_POST)).toStrictEqual({
       "body": "name=sample&something=else&what=cool&time=Wed%252C%252021%2520Oct%25202015%252018%253A27%253A50%2520GMT&=undefined",
       "headers": {
