@@ -18,7 +18,6 @@ const detectCode = () => {
 
 const remDetectCode = () => {
   const els = document.getElementsByClassName("code-found");
-  console.log({ rem: els });
   for (let el of els) {
     el.remove();
   }

@@ -1,4 +1,4 @@
-import { assert, expect, test } from 'vitest'
+import { assert, expect, test } from 'vitest';
 import { getHeaderContentType } from './content-type';
 import { ContentType } from './parser';
 
