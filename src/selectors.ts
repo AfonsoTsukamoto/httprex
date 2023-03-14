@@ -11,13 +11,11 @@ export const HOST_SELECTOR_MAP: Record<Host, Selector> = {
   [Host.UNK]: () => null // COMING SOON
 };
 
-export const findCodeBlocks = (host: Host, args?: Record<any, any>, domDoc: Document = document): Nullable<NodeList> => {
+export const findCodeBlocks = (host: Host, args?: Record<any, any>): Nullable<NodeList> => {
   const selector = HOST_SELECTOR_MAP[host];
-
-  console.log({ document });
   if (selector) {
     if (typeof selector === 'string') {
-      return domDoc.querySelectorAll(selector);
+      return document.querySelectorAll(selector);
     } else if (typeof selector === 'function') {
       return selector(args);
     }
