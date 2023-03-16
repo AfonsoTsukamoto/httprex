@@ -11,6 +11,16 @@
   "background": {
     "service_worker": "dist/src/pages/background/index.js"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.github.com/*",
+        "https://*.gitlab.com/*"
+      ],
+      "js": ["dist/src/pages/content/index.js"],
+      "run_at": "document_end"
+    }
+  ],
   "action": {
     "default_icon": {
       "16": "public/Log1.png",

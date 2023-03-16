@@ -15,7 +15,7 @@ export default defineConfig({
       input: {
         //devtools: resolve(pagesDir, 'devtools', 'index.html'),
         //panel: resolve(pagesDir, 'panel', 'index.html'),
-        //content: resolve(pagesDir, 'content', 'index.ts'),
+        content: resolve(pagesDir, 'content', 'index.tsx'),
         background: resolve(pagesDir, 'background', 'index.ts'),
         //popup: resolve(pagesDir, 'popup', 'index.html'),
         //newtab: resolve(pagesDir, 'newtab', 'index.html'),
