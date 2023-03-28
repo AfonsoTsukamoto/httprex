@@ -2,11 +2,36 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { getURLHost } from '@src/host';
 import { findCodeBlocks } from '@src/selectors';
+import { HTTPParser } from '@src/lib/parsers/http';
+import RequestMethod from '@components/RequestMethod';
+import 'antd/dist/reset.css';
 
 const MAX_ATTEMPTS = 6;
 let attempts = 0;
 
-const Foo: React.FC = () => (<div>Kore ha React desu</div>);
+interface Props {
+  content: HTMLElement;
+}
+
+const Foo: React.FC<Props> = ({ content }) => {
+  const parser = new HTTPParser();
+  const parsed = parser.parse(content.textContent ?? "");
+
+  console.log({ parsed });
+  return (
+    <div>
+      <>
+        {parsed &&
+          (<>
+            <RequestMethod readOnly={false} method={parsed.method as RequestMethod} />
+            {"  "}
+            {parsed.url}
+          </>)}
+        <div dangerouslySetInnerHTML={{__html: content ? content?.outerHTML : ""}} />
+      </>
+    </div>
+  );
+}
 
 const host = getURLHost(location.href)
 if (host) {
@@ -14,16 +39,16 @@ if (host) {
     let jsInitChecker = setInterval(() => {
       const codeBlocks = findCodeBlocks(host);
       if (codeBlocks?.length) {
+        console.log({ codeBlocks });
         clearInterval(jsInitChecker);
-
-        console.log({host, codeBlocks });
 
         if (codeBlocks?.length) {
           for (let block of codeBlocks) {
+            console.log({ block, content: block.textContent });
             const blockRoot = createRoot(block);
             blockRoot.render(
-              <Foo/>
-              );
+              <Foo content={block as HTMLElement} />
+            );
           };
         }
       } else if (attempts > MAX_ATTEMPTS) {

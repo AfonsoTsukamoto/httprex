@@ -1,14 +1,14 @@
-import { ContentType } from '../parser';
+import { RequestContentType } from '@src/constants';
 
-export const convertBody = (contentType: Nullable<ContentType>, content: string) => {
+export const convertBody = (contentType: Nullable<RequestContentType>, content: string) => {
   switch(contentType) {
-    case ContentType.XML: {
+    case RequestContentType.XML: {
       return convertXML(content);
     }
-    case ContentType.JSON: {
+    case RequestContentType.JSON: {
       return convertJSON(content);
     }
-    case ContentType.X_WWW_FORM_URL_ENCODED: {
+    case RequestContentType.X_WWW_FORM_URL_ENCODED: {
       return convertFormURLEncoded(content);
     }
   }
@@ -17,7 +17,11 @@ export const convertBody = (contentType: Nullable<ContentType>, content: string)
 
 export const convertXML = (content: string) => {};
 
-export const convertJSON = (content: string) => JSON.parse(content);
+export const convertJSON = (content: string) => {
+  const clean = content.replace(/\n|\r/g, "")
+  console.log({content, clean});
+  return JSON.parse(clean);
+}
 
 export const convertFormURLEncoded = (content: string) => {
   const lines = content.split('\n');
