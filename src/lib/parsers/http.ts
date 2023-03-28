@@ -2,10 +2,10 @@
 // Heavily inspired by https://github.com/Huachao/vscode-restclient/blob/master/src/utils/httpRequestParser.ts
 // and https://github.com/bewakes/vim-rest-client/blob/master/python/rest.py
 
-import { Parser, ParserRequest, ParserError, Method, ParserErrorType, Request, ContentType } from '../parser';
+import { Parser } from '../parser';
 import { getHeaderContentType, findContentTypeHeader } from '../content-type';
 import { convertBody } from './body-helpers';
-import { EOL_R } from '@src/constants';
+import { EOL_R, RequestContentType } from '@src/constants';
 
 enum ParseState {
   URL,
@@ -19,7 +19,7 @@ const REMOVE_HEADERS = [
 
 export class HTTPParser implements Parser {
   private readonly defaultMethod = 'GET';
-  private readonly defaultContentType = ContentType.X_WWW_FORM_URL_ENCODED;
+  private readonly defaultContentType = RequestContentType.X_WWW_FORM_URL_ENCODED;
   private readonly queryStringLinePrefix = /^\s*[&\?]/;
   private readonly methodRegex = /^(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH)\s+/i;
   private readonly httpVersionRegex = /\s+HTTP\/.*$/i;
@@ -32,7 +32,6 @@ export class HTTPParser implements Parser {
     const requestLines: string[] = [];
     const headersLines: string[] = [];
     const bodyLines: string[] = [];
-    const variableLines: string[] = [];
 
     let state = ParseState.URL;
     let currentLine: string | undefined;
@@ -75,7 +74,7 @@ export class HTTPParser implements Parser {
     const headers = this.parseRequestHeaders(headersLines, requestLine.url);
 
     // parse body lines
-    const contentType: ContentType = getHeaderContentType(findContentTypeHeader(headers)) || this.defaultContentType;
+    const contentType: RequestContentType = getHeaderContentType(findContentTypeHeader(headers)) || this.defaultContentType;
     let body = this.parseBody(bodyLines, contentType);
 
     body = convertBody(contentType, body ?? "");
@@ -132,16 +131,15 @@ export class HTTPParser implements Parser {
             headers[headerNames[normalizedFieldName]] += `${splitter}${fieldValue}`;
         }
     });
-
     return headers;
   }
 
-  private parseBody(lines: string[], contentTypeHeader: ContentType): Nullable<string> {
+  private parseBody(lines: string[], contentTypeHeader: RequestContentType): Nullable<string> {
     if (lines.length === 0) {
       return null;
     }
 
-    if (contentTypeHeader === ContentType.X_WWW_FORM_URL_ENCODED) {
+    if (contentTypeHeader === RequestContentType.X_WWW_FORM_URL_ENCODED) {
       return lines.reduce((p, c, i) => {
         p += `${(i === 0 || c.startsWith('&') ? '' : '\n')}${c}`;
         return p;
