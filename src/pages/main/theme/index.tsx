@@ -13,7 +13,7 @@ interface Props {
   theme?: ThemeType;
 }
 
-const Theme: React.FC<Props> & { Context: React.Context<string> } = ({ theme = ThemeType.DARK, children }) => (
+const Theme: React.FC<Props> & { Context: React.Context<string> } = ({ theme = ThemeType.LIGHT, children }) => (
   <ThemeContext.Provider value={theme}>
     <ConfigProvider
       theme={{
