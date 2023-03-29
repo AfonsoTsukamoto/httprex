@@ -13,6 +13,7 @@ export default defineConfig({
     sourcemap: process.env.__DEV__ === 'true',
     rollupOptions: {
       input: {
+        main: resolve(__dirname, 'index.html'),
         //devtools: resolve(pagesDir, 'devtools', 'index.html'),
         //panel: resolve(pagesDir, 'panel', 'index.html'),
         content: resolve(pagesDir, 'content', 'index.tsx'),
