@@ -1,6 +1,5 @@
 export interface Request  {
   method: RequestMethod;
-  // XXX revisit
   body?: string;
 
   type?: RequestContentType;

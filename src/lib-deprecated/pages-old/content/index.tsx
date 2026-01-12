@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { getURLHost } from '@src/host';
 import { findCodeBlocks } from '@src/selectors';
 import { HTTPParser } from '@src/lib/parsers/http';
-import RequestMethod from '@components/RequestMethod';
+import RequestMethod from '@components/Request/RequestMethod';
 import 'antd/dist/reset.css';
 
 const MAX_ATTEMPTS = 6;
@@ -17,7 +17,6 @@ const Foo: React.FC<Props> = ({ content }) => {
   const parser = new HTTPParser();
   const parsed = parser.parse(content.textContent ?? "");
 
-  console.log({ parsed });
   return (
     <div>
       <>
@@ -39,12 +38,10 @@ if (host) {
     let jsInitChecker = setInterval(() => {
       const codeBlocks = findCodeBlocks(host);
       if (codeBlocks?.length) {
-        console.log({ codeBlocks });
         clearInterval(jsInitChecker);
 
         if (codeBlocks?.length) {
           for (let block of codeBlocks) {
-            console.log({ block, content: block.textContent });
             const blockRoot = createRoot(block);
             blockRoot.render(
               <Foo content={block as HTMLElement} />

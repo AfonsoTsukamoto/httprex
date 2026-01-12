@@ -4,11 +4,7 @@ import RequestMethod from './RequestMethod';
 
 interface Props {
   method: RequestMethod;
-  // XXX also might need to be smarter to handle vars
-  // fine for now
   url: string;
-  // XXX not sure yet what body will be
-  // most likely a Body type
   body?: string | object;
   type?: RequestContentType;
   mode?: RequestMode;

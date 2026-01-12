@@ -19,7 +19,6 @@ export const convertXML = (content: string) => {};
 
 export const convertJSON = (content: string) => {
   const clean = content.replace(/\n|\r/g, "")
-  console.log({content, clean});
   return JSON.parse(clean);
 }
 

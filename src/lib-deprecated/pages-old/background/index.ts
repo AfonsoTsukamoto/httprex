@@ -1,6 +1,3 @@
-//import { getURLHost } from '@src/host';
-//import { findCodeBlocks } from '@src/selectors';
-
 chrome.runtime.onInstalled.addListener(() => {
   chrome.action.setBadgeText({
     text: "OFF",
@@ -12,22 +9,12 @@ const renderFound = (els: NodeListOf<Element>) => {
   code.textContent = "CODE FOUND";
   code.classList.add("code-found")
   for (let el of els) {
-    console.log({ el });
     el.append(code);
   }
 }
 
-
 const detectCode = (url?: string) => {
- // const host = getURLHost(url)
- // if (host) {
- //   const els = findCodeBlocks(host);
- //   if (els?.length) {
- //     renderFound(els);
- //   }
- // } else {
- //   console.log({ url, msg: 'host not found' });
- // }
+  // Function placeholder - will be refactored in Phase 4
 }
 
 const remDetectCode = () => {
@@ -38,7 +25,6 @@ const remDetectCode = () => {
 }
 
 chrome.action.onClicked.addListener(async (tab) => {
-  console.log("clicked");
   if (tab && tab.id) {
 
     // Retrieve the action badge to check if the extension is 'ON' or 'OFF'
