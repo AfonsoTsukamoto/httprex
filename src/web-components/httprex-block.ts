@@ -13,16 +13,20 @@ import { sharedStyles } from './styles';
 import './request-editor';
 import './response-viewer';
 import './variable-panel';
-import type { HttprexRequestElement } from './request-editor';
-import type { HttprexResponseElement } from './response-viewer';
-import type { HttprexVariablePanelElement } from './variable-panel';
+import './environment-selector';
+import './secrets-panel';
+import type { HttpRexRequestElement } from './request-editor';
+import type { HttpRexResponseElement } from './response-viewer';
+import type { HttpRexVariablePanelElement } from './variable-panel';
+import type { HttpRexSecretsPanelElement } from './secrets-panel';
 
-export class HttprexBlockElement extends HTMLElement {
+export class HttpRexBlockElement extends HTMLElement {
   private shadow: ShadowRoot;
   private request: ParsedRequest | null = null;
-  private requestElement: HttprexRequestElement | null = null;
-  private responseElement: HttprexResponseElement | null = null;
-  private variablePanelElement: HttprexVariablePanelElement | null = null;
+  private requestElement: HttpRexRequestElement | null = null;
+  private responseElement: HttpRexResponseElement | null = null;
+  private variablePanelElement: HttpRexVariablePanelElement | null = null;
+  private secretsPanelElement: HttpRexSecretsPanelElement | null = null;
   private isExecuting: boolean = false;
   private sendButton: HTMLButtonElement | null = null;
   private fileVariables: Record<string, string> = {};
@@ -55,7 +59,7 @@ export class HttprexBlockElement extends HTMLElement {
         const errorMessage = fileResult.errors.length > 0
           ? fileResult.errors.map(e => e.message).join(', ')
           : 'Failed to parse HTTP request';
-        console.error('Httprex parse error:', errorMessage, fileResult.errors);
+        console.error('HttpRex parse error:', errorMessage, fileResult.errors);
         this.renderError(errorMessage);
         return;
       }
@@ -63,7 +67,7 @@ export class HttprexBlockElement extends HTMLElement {
       // Use the first request from the file
       this.request = fileResult.data.requests[0];
       this.fileVariables = fileResult.data.fileVariables || {};
-      console.log('Httprex parsed request:', this.request);
+      console.log('HttpRex parsed request:', this.request);
       this.render();
     } else {
       // Single request without file variables
@@ -73,14 +77,14 @@ export class HttprexBlockElement extends HTMLElement {
         const errorMessage = result.errors.length > 0
           ? result.errors.map(e => e.message).join(', ')
           : 'Failed to parse HTTP request';
-        console.error('Httprex parse error:', errorMessage, result.errors);
+        console.error('HttpRex parse error:', errorMessage, result.errors);
         this.renderError(errorMessage);
         return;
       }
 
       this.request = result.data;
       this.fileVariables = {};
-      console.log('Httprex parsed request:', this.request);
+      console.log('HttpRex parsed request:', this.request);
       this.render();
     }
   }
@@ -181,11 +185,13 @@ export class HttprexBlockElement extends HTMLElement {
           >
             Copy as cURL
           </button>
+          <httprex-environment-selector></httprex-environment-selector>
           <span class="httprex-info">${this.request?.name || ''}</span>
         </div>
 
         ${this.renderVariableWarning()}
 
+        <div id="secrets-panel-container"></div>
         <div id="variable-panel-container"></div>
         <div id="request-container"></div>
         <div id="response-container"></div>
@@ -195,10 +201,22 @@ export class HttprexBlockElement extends HTMLElement {
     // Get reference to send button
     this.sendButton = this.shadow.querySelector('.httprex-send-button') as HTMLButtonElement;
 
+    // Create secrets panel (if there are secret references in the request)
+    const secretsPanelContainer = this.shadow.getElementById('secrets-panel-container');
+    if (secretsPanelContainer && this.request) {
+      this.secretsPanelElement = document.createElement('httprex-secrets-panel') as HttpRexSecretsPanelElement;
+      // Find secret references in the request
+      const secretRefs = this.findSecretReferences();
+      if (secretRefs.length > 0) {
+        this.secretsPanelElement.setUnresolvedSecrets(secretRefs);
+      }
+      secretsPanelContainer.appendChild(this.secretsPanelElement);
+    }
+
     // Create variable panel
     const variablePanelContainer = this.shadow.getElementById('variable-panel-container');
     if (variablePanelContainer) {
-      this.variablePanelElement = document.createElement('httprex-variable-panel') as HttprexVariablePanelElement;
+      this.variablePanelElement = document.createElement('httprex-variable-panel') as HttpRexVariablePanelElement;
       this.variablePanelElement.setFileVariables(this.fileVariables);
       variablePanelContainer.appendChild(this.variablePanelElement);
     }
@@ -206,7 +224,7 @@ export class HttprexBlockElement extends HTMLElement {
     // Create and attach request element
     const requestContainer = this.shadow.getElementById('request-container');
     if (requestContainer && this.request) {
-      this.requestElement = document.createElement('httprex-request') as HttprexRequestElement;
+      this.requestElement = document.createElement('httprex-request') as HttpRexRequestElement;
       this.requestElement.setRequest(this.request);
       requestContainer.appendChild(this.requestElement);
     }
@@ -214,7 +232,7 @@ export class HttprexBlockElement extends HTMLElement {
     // Create response element (empty initially)
     const responseContainer = this.shadow.getElementById('response-container');
     if (responseContainer) {
-      this.responseElement = document.createElement('httprex-response') as HttprexResponseElement;
+      this.responseElement = document.createElement('httprex-response') as HttpRexResponseElement;
       responseContainer.appendChild(this.responseElement);
     }
   }
@@ -241,6 +259,40 @@ export class HttprexBlockElement extends HTMLElement {
     `;
   }
 
+  /**
+   * Find all secret references in the current request
+   */
+  private findSecretReferences(): string[] {
+    if (!this.request) return [];
+
+    const secrets: string[] = [];
+    const regex = /\{\{(secret:|vault:|op:\/\/)([^}]+)\}\}/g;
+
+    // Check URL
+    let match;
+    while ((match = regex.exec(this.request.url)) !== null) {
+      secrets.push(match[1] + match[2]);
+    }
+
+    // Check headers
+    for (const value of Object.values(this.request.headers)) {
+      regex.lastIndex = 0;
+      while ((match = regex.exec(value)) !== null) {
+        secrets.push(match[1] + match[2]);
+      }
+    }
+
+    // Check body
+    if (typeof this.request.body === 'string') {
+      regex.lastIndex = 0;
+      while ((match = regex.exec(this.request.body)) !== null) {
+        secrets.push(match[1] + match[2]);
+      }
+    }
+
+    return [...new Set(secrets)]; // Dedupe
+  }
+
   async executeRequest() {
     if (!this.request || this.isExecuting) return;
 
@@ -248,17 +300,28 @@ export class HttprexBlockElement extends HTMLElement {
     this.updateButtonState();
 
     try {
+      // Set file variables in resolver context
+      variableResolver.setContext({ fromFile: this.fileVariables });
+
       // Load global variables from storage before execution
       await variableResolver.loadGlobalVariables();
 
-      // Resolve variables if any
-      const resolvedRequest = this.request.variables.length > 0
-        ? variableResolver.resolveRequest(this.request)
-        : this.request;
+      // Check if we have secret references - use async resolution
+      const hasSecrets = this.findSecretReferences().length > 0;
+
+      // Resolve variables (use async version if secrets are present)
+      let resolvedRequest;
+      if (this.request.variables.length > 0 || hasSecrets) {
+        resolvedRequest = hasSecrets
+          ? await variableResolver.resolveRequestAsync(this.request)
+          : variableResolver.resolveRequest(this.request);
+      } else {
+        resolvedRequest = this.request;
+      }
 
       // Execute the request
       const response = await executeRequest(resolvedRequest);
-      console.log('Httprex response:', response);
+      console.log('HttpRex response:', response);
 
       // Display response
       if (this.responseElement) {
@@ -326,4 +389,4 @@ export class HttprexBlockElement extends HTMLElement {
   }
 }
 
-customElements.define('httprex-block', HttprexBlockElement);
+customElements.define('httprex-block', HttpRexBlockElement);

@@ -6,7 +6,7 @@
 import { getGlobalVariableStorage } from '../lib-httprex/variables/storage';
 import { sharedStyles } from './styles';
 
-export class HttprexVariablePanelElement extends HTMLElement {
+export class HttpRexVariablePanelElement extends HTMLElement {
   private shadow: ShadowRoot;
   private variables: Record<string, string> = {};
   private fileVariables: Record<string, string> = {};
@@ -363,4 +363,4 @@ export class HttprexVariablePanelElement extends HTMLElement {
   }
 }
 
-customElements.define('httprex-variable-panel', HttprexVariablePanelElement);
+customElements.define('httprex-variable-panel', HttpRexVariablePanelElement);

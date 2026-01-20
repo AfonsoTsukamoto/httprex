@@ -7,6 +7,8 @@ import { ParsedRequest, VariableContext } from '../types';
 import { resolveVariables as lexerResolve } from '../parser/lexer';
 import { resolveSystemVariable, isSystemVariable } from './system-vars';
 import { getGlobalVariableStorage } from './storage';
+import { environmentManager } from './environment';
+import { SecretManager, secretManager } from '../secrets';
 
 export class VariableResolver {
   private context: VariableContext;
@@ -37,7 +39,7 @@ export class VariableResolver {
   }
 
   /**
-   * Resolve all variables in a request
+   * Resolve all variables in a request (sync version - no secrets support)
    */
   resolveRequest(request: ParsedRequest): ParsedRequest {
     const allVariables = this.buildVariableMap();
@@ -51,29 +53,49 @@ export class VariableResolver {
   }
 
   /**
+   * Resolve all variables in a request (async version - with secrets support)
+   */
+  async resolveRequestAsync(request: ParsedRequest): Promise<ParsedRequest> {
+    const allVariables = this.buildVariableMap();
+
+    return {
+      ...request,
+      url: await this.resolveStringAsync(request.url, allVariables),
+      headers: await this.resolveHeadersAsync(request.headers, allVariables),
+      body: await this.resolveBodyAsync(request.body, allVariables)
+    };
+  }
+
+  /**
    * Build a complete variable map from all sources
-   * Priority: system vars > global storage > file vars > environment vars
+   * Priority: secrets > system vars > global storage > file vars > environment vars
    */
   private buildVariableMap(): Record<string, string> {
     const map: Record<string, string> = {};
 
-    // 1. Environment variables (lowest priority)
+    // 1. Environment variables from EnvironmentManager (lowest priority)
+    const envVars = environmentManager.getEnvironmentVariables();
+    Object.assign(map, envVars);
+
+    // 2. Context-provided environment variables
     if (this.context.fromEnvironment) {
       Object.assign(map, this.context.fromEnvironment);
     }
 
-    // 2. File variables
+    // 3. File variables
     if (this.context.fromFile) {
       Object.assign(map, this.context.fromFile);
     }
 
-    // 3. Global variables from storage
+    // 4. Global variables from storage
     Object.assign(map, this.globalVariables);
 
-    // 4. System variables (highest priority - will be resolved on-demand)
+    // 5. System variables (highest non-secret priority - will be resolved on-demand)
     if (this.context.fromSystem) {
       Object.assign(map, this.context.fromSystem);
     }
+
+    // Note: Secrets are resolved separately in resolveStringAsync
 
     return map;
   }
@@ -157,6 +179,104 @@ export class VariableResolver {
     });
   }
 
+  // =============== Async methods for secrets support ===============
+
+  private async resolveHeadersAsync(
+    headers: Record<string, string>,
+    variables: Record<string, string>
+  ): Promise<Record<string, string>> {
+    const resolved: Record<string, string> = {};
+
+    for (const [key, value] of Object.entries(headers)) {
+      resolved[key] = await this.resolveStringAsync(value, variables);
+    }
+
+    return resolved;
+  }
+
+  private async resolveBodyAsync(
+    body: string | Record<string, unknown> | null | undefined,
+    variables: Record<string, string>
+  ): Promise<string | Record<string, unknown> | null | undefined> {
+    if (!body) return body;
+
+    if (typeof body === 'string') {
+      return this.resolveStringAsync(body, variables);
+    }
+
+    // For objects, recursively resolve
+    return this.resolveObjectAsync(body, variables);
+  }
+
+  private async resolveObjectAsync(
+    obj: Record<string, unknown>,
+    variables: Record<string, string>
+  ): Promise<Record<string, unknown>> {
+    const resolved: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value === 'string') {
+        resolved[key] = await this.resolveStringAsync(value, variables);
+      } else if (typeof value === 'object' && value !== null) {
+        if (Array.isArray(value)) {
+          resolved[key] = await Promise.all(
+            value.map(async item =>
+              typeof item === 'string'
+                ? this.resolveStringAsync(item, variables)
+                : item
+            )
+          );
+        } else {
+          resolved[key] = await this.resolveObjectAsync(value as Record<string, unknown>, variables);
+        }
+      } else {
+        resolved[key] = value;
+      }
+    }
+
+    return resolved;
+  }
+
+  /**
+   * Resolve a string with secrets support (async)
+   */
+  private async resolveStringAsync(
+    str: string,
+    variables: Record<string, string>
+  ): Promise<string> {
+    // Find all variable references
+    const matches = [...str.matchAll(/\{\{([^}]+)\}\}/g)];
+
+    let result = str;
+    for (const match of matches) {
+      const varName = match[1].trim();
+      let value: string | null = null;
+
+      // Check if it's a secret reference (highest priority)
+      const secretRef = SecretManager.parseSecretReference(varName);
+      if (secretRef) {
+        const secretResult = await secretManager.getSecret(secretRef);
+        if (secretResult.found && secretResult.value !== null) {
+          value = secretResult.value;
+        }
+      }
+      // Check system variables
+      else if (isSystemVariable(varName)) {
+        value = resolveSystemVariable(varName);
+      }
+      // Check regular variables
+      else if (variables[varName] !== undefined) {
+        value = variables[varName];
+      }
+
+      if (value !== null) {
+        result = result.replace(match[0], value);
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Get list of unresolved variables in a request
    */
@@ -190,7 +310,12 @@ export class VariableResolver {
     const matches = str.matchAll(/\{\{([^}]+)\}\}/g);
     for (const match of matches) {
       const varName = match[1].trim();
-      if (!isSystemVariable(varName) && variables[varName] === undefined) {
+      // Skip system variables (always resolvable)
+      if (isSystemVariable(varName)) continue;
+      // Skip secret references (resolved asynchronously via SecretManager)
+      if (SecretManager.isSecretReference(varName)) continue;
+      // Check if variable is defined
+      if (variables[varName] === undefined) {
         unresolved.add(varName);
       }
     }

@@ -317,7 +317,7 @@ Accept: application/json`;
 GET {{apiUrl}}/user HTTP/1.1
 Accept: application/vnd.github.v3+json
 Authorization: Bearer {{token}}
-User-Agent: Httprex/2.0
+User-Agent: HttpRex/2.0
 
 ###
 
@@ -338,7 +338,7 @@ Content-Type: application/json
 
 {
   "name": "my-new-repo",
-  "description": "Created via Httprex",
+  "description": "Created via HttpRex",
   "private": false,
   "auto_init": true
 }`;

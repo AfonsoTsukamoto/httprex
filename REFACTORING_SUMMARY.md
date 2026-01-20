@@ -1,4 +1,4 @@
-# Httprex Refactoring Summary
+# HttpRex Refactoring Summary
 
 **Date:** January 8, 2025
 **Version:** 2.0.0
@@ -51,7 +51,7 @@ src/lib-httprex/
 │   ├── file-vars.ts        # @varName = value parsing
 │   ├── system-vars.ts      # $timestamp, $guid, etc.
 │   └── environment.ts      # Environment variable support
-└── index.ts                # Public API (Httprex class)
+└── index.ts                # Public API (HttpRex class)
 ```
 
 **Key Features:**
@@ -215,16 +215,16 @@ Standalone Library Architecture
 ### Library Usage
 
 ```typescript
-import { Httprex } from 'httprex';
+import { HttpRex } from 'httprex';
 
 // Parse HTTP request
-const result = Httprex.parse(`
+const result = HttpRex.parse(`
 GET https://api.example.com/users
 Authorization: Bearer {{token}}
 `);
 
 // Execute request
-const response = await Httprex.execute(result.data, {
+const response = await HttpRex.execute(result.data, {
   token: 'abc123'
 });
 ```
@@ -246,8 +246,8 @@ GET https://api.example.com/data
 </code></pre>
 
 <script type="module">
-  import { Httprex } from 'httprex';
-  Httprex.init(); // Finds and renders all blocks
+  import { HttpRex } from 'httprex';
+  HttpRex.init(); // Finds and renders all blocks
 </script>
 ```
 

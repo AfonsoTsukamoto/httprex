@@ -6,7 +6,7 @@
 import { HttpResponse } from '../lib-httprex/types';
 import { sharedStyles, getStatusColor } from './styles';
 
-export class HttprexResponseElement extends HTMLElement {
+export class HttpRexResponseElement extends HTMLElement {
   private shadow: ShadowRoot;
   private response: HttpResponse | null = null;
 
@@ -258,4 +258,4 @@ export class HttprexResponseElement extends HTMLElement {
   }
 }
 
-customElements.define('httprex-response', HttprexResponseElement);
+customElements.define('httprex-response', HttpRexResponseElement);

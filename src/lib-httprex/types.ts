@@ -85,7 +85,7 @@ export type ParserResult<T> =
   | { success: true; data: T; errors: ParserError[] }
   | { success: false; data: null; errors: ParserError[] };
 
-export interface HttprexOptions {
+export interface HttpRexOptions {
   selector?: string;
   cors?: {
     proxyUrl?: string;

@@ -6,7 +6,7 @@
 import { ParsedRequest } from '../lib-httprex/types';
 import { sharedStyles, getMethodColor } from './styles';
 
-export class HttprexRequestElement extends HTMLElement {
+export class HttpRexRequestElement extends HTMLElement {
   private shadow: ShadowRoot;
   private request: ParsedRequest | null = null;
 
@@ -236,4 +236,4 @@ export class HttprexRequestElement extends HTMLElement {
   }
 }
 
-customElements.define('httprex-request', HttprexRequestElement);
+customElements.define('httprex-request', HttpRexRequestElement);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Httprex Demo - Interactive HTTP Requests</title>
+  <title>HttpRex Demo - Interactive HTTP Requests</title>
   <style>
     * {
       margin: 0;
@@ -111,7 +111,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>🚀 Httprex Demo</h1>
+      <h1>🚀 HttpRex Demo</h1>
       <p class="subtitle">Interactive HTTP Requests in Markdown</p>
       <p class="description">
         Like mermaid.js, but for HTTP requests. Compatible with VSCode REST Client format.
@@ -143,7 +143,7 @@ POST https://jsonplaceholder.typicode.com/posts
 Content-Type: application/json
 
 {
-  "title": "Hello from Httprex",
+  "title": "Hello from HttpRex",
   "body": "This is a test post created with httprex",
   "userId": 1
 }
@@ -212,7 +212,7 @@ DELETE https://jsonplaceholder.typicode.com/posts/1
       <httprex-block>
 ###
 GET https://httpbin.org/headers
-User-Agent: Httprex/1.0
+User-Agent: HttpRex/1.0
 Accept: application/json
 Accept-Language: en-US,en;q=0.9
 Cache-Control: no-cache
@@ -248,14 +248,14 @@ GET https://api.github.com/users/this-user-definitely-does-not-exist-12345
 
       <div class="note">
         <strong>💡 Tip:</strong>
-        Httprex shows detailed error responses including status codes, timing, and error messages.
+        HttpRex shows detailed error responses including status codes, timing, and error messages.
       </div>
     </div>
 
     <!-- Instructions -->
     <div class="demo-section">
       <h2>📚 How to Use</h2>
-      <p>Instructions for using Httprex in your own projects.</p>
+      <p>Instructions for using HttpRex in your own projects.</p>
 
       <div class="code-example">
 &lt;!-- Basic Usage --&gt;
@@ -281,19 +281,19 @@ Authorization: Bearer {{token}}
 
       <h3 style="margin-top: 24px; margin-bottom: 12px; color: #333;">Programmatic API</h3>
       <div class="code-example">
-import Httprex from 'httprex';
+import HttpRex from 'httprex';
 
 // Parse request
-const result = Httprex.parse(`
+const result = HttpRex.parse(`
 GET https://api.example.com/data
 `);
 
 // Execute request
-const response = await Httprex.execute(result.data);
+const response = await HttpRex.execute(result.data);
 console.log(response);
 
 // Auto-discover and init all blocks
-Httprex.init({ selector: '.language-httprex' });
+HttpRex.init({ selector: '.language-httprex' });
       </div>
     </div>
 
@@ -323,11 +323,11 @@ Httprex.init({ selector: '.language-httprex' });
   <!-- Load the library -->
   <script type="module">
     // Import and initialize httprex
-    import Httprex, { LocalStorageVariableStorage } from './src/lib-httprex/index.ts';
+    import HttpRex, { LocalStorageVariableStorage } from './src/lib-httprex/index.ts';
     import { initAll } from './src/web-components/index.ts';
 
     // Initialize httprex with localStorage for persistent variables
-    Httprex.init({
+    HttpRex.init({
       variableStorage: new LocalStorageVariableStorage('httprex-demo')
     });
 

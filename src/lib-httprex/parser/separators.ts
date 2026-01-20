@@ -75,8 +75,9 @@ export function splitRequests(text: string): RequestBlock[] {
     }
   }
 
-  // If no separators found, treat entire file as one request (unless it's only file variables)
-  if (!foundSeparator && lines.length > 0) {
+  // If no separators found and no blocks were created, treat entire file as one request
+  // (unless it's only file variables)
+  if (!foundSeparator && blocks.length === 0 && lines.length > 0) {
     const content = text.trim();
     if (content && !isOnlyFileVariables(content)) {
       blocks.push({

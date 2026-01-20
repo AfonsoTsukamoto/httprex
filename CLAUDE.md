@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Httprex** is a JavaScript library (like mermaid.js) for embedding interactive HTTP requests in markdown. It parses VSCode REST Client format (`.http` files) and renders them as executable requests in any markdown editor or webpage.
+**HttpRex** is a JavaScript library (like mermaid.js) for embedding interactive HTTP requests in markdown. It parses VSCode REST Client format (`.http` files) and renders them as executable requests in any markdown editor or webpage.
 
 **Architecture:** Standalone library (`lib-httprex`) + Web Components + Chrome extension as reference implementation
 
@@ -66,7 +66,7 @@ Reference implementation using lib-httprex + web components
 ```
 Markdown with ```httprex block
   ↓
-Httprex.init() discovers blocks
+HttpRex.init() discovers blocks
   ↓
 HttpParser.parseFile() - Parses multiple requests
   ↓
@@ -85,7 +85,7 @@ HttpResponse displayed in <httprex-response>
 
 ### Key Files
 
-- **`src/lib-httprex/index.ts`**: Public API - `Httprex.parse()`, `Httprex.execute()`, `Httprex.init()`
+- **`src/lib-httprex/index.ts`**: Public API - `HttpRex.parse()`, `HttpRex.execute()`, `HttpRex.init()`
 - **`src/lib-httprex/parser/index.ts`**: Main parser with `parse()` and `parseFile()`
 - **`src/lib-httprex/executor/fetch-adapter.ts`**: HTTP execution with timeout and CORS
 - **`src/lib-httprex/variables/resolver.ts`**: Variable resolution engine
@@ -143,16 +143,16 @@ Authorization: token {{githubToken}}
 Or programmatically:
 
 ```javascript
-import Httprex from 'httprex';
+import HttpRex from 'httprex';
 
 // Parse request
-const result = Httprex.parse(`
+const result = HttpRex.parse(`
 GET https://api.example.com/users
 Authorization: Bearer token123
 `);
 
 // Execute request
-const executed = await Httprex.execute(result.data);
+const executed = await HttpRex.execute(result.data);
 console.log(executed.response);
 ```
 

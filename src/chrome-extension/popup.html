@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HttpRex Settings</title>
+  <style>
+    :root {
+      --bg: #1e1e1e;
+      --bg-secondary: #252526;
+      --text: #d4d4d4;
+      --text-secondary: #858585;
+      --border: #3c3c3c;
+      --accent: #61affe;
+      --success: #49cc90;
+      --warning: #fca130;
+      --error: #f93e3e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 320px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 .icon {
+      font-size: 20px;
+    }
+
+    .section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+    }
+
+    .status-dot.unlocked {
+      background: var(--success);
+    }
+
+    .status-text {
+      font-size: 13px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      filter: brightness(1.1);
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background: var(--bg-secondary);
+      border-color: var(--text-secondary);
+    }
+
+    button.danger {
+      background: var(--error);
+      color: #fff;
+    }
+
+    button.danger:hover {
+      filter: brightness(1.1);
+    }
+
+    .error-message {
+      background: rgba(249, 62, 62, 0.1);
+      border: 1px solid var(--error);
+      border-radius: 4px;
+      color: var(--error);
+      padding: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .success-message {
+      background: rgba(73, 204, 144, 0.1);
+      border: 1px solid var(--success);
+      border-radius: 4px;
+      color: var(--success);
+      padding: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .secrets-list {
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .secret-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      margin-bottom: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+    }
+
+    .secret-item button {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    .add-secret-form {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    <span class="icon">🦖</span>
+    HttpRex
+  </h1>
+
+  <!-- Vault Section -->
+  <div class="section">
+    <div class="section-title">Secrets Vault</div>
+
+    <div class="status">
+      <div class="status-dot" id="vault-status-dot"></div>
+      <span class="status-text" id="vault-status-text">Checking...</span>
+    </div>
+
+    <div id="error-message" class="error-message hidden"></div>
+    <div id="success-message" class="success-message hidden"></div>
+
+    <!-- Unlock Form (shown when locked) -->
+    <div id="unlock-form">
+      <div class="form-group">
+        <label for="vault-password">Vault Password</label>
+        <input type="password" id="vault-password" placeholder="Enter password to unlock">
+      </div>
+      <button class="primary" id="unlock-btn">Unlock Vault</button>
+    </div>
+
+    <!-- Vault Controls (shown when unlocked) -->
+    <div id="vault-controls" class="hidden">
+      <button class="secondary" id="lock-btn">Lock Vault</button>
+    </div>
+  </div>
+
+  <!-- Secrets Management (shown when unlocked) -->
+  <div class="section hidden" id="secrets-section">
+    <div class="section-title">Stored Secrets</div>
+
+    <div class="secrets-list" id="secrets-list">
+      <div class="secret-item">
+        <span>Loading...</span>
+      </div>
+    </div>
+
+    <div class="add-secret-form">
+      <div class="form-group">
+        <label for="secret-name">Secret Name</label>
+        <input type="text" id="secret-name" placeholder="e.g., api-token">
+      </div>
+      <div class="form-group">
+        <label for="secret-value">Secret Value</label>
+        <input type="password" id="secret-value" placeholder="Enter secret value">
+      </div>
+      <button class="primary" id="add-secret-btn">Add Secret</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Secrets are encrypted locally and never synced to cloud.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

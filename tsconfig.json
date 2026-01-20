@@ -33,7 +33,10 @@
     "src"
   ],
   "exclude": [
-    "src/lib-deprecated/**/*"
+    "src/lib-deprecated/**/*",
+    "src/**/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
   ],
   "references": [
     { "path": "./tsconfig.node.json" }

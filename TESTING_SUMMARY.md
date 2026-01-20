@@ -1,4 +1,4 @@
-# Httprex Testing Summary
+# HttpRex Testing Summary
 
 **Date:** January 8, 2025
 **Status:** Phase 6 - Parser Tests Completed

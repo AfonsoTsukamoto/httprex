@@ -8,12 +8,16 @@ import './httprex-block';
 import './request-editor';
 import './response-viewer';
 import './variable-panel';
+import './environment-selector';
+import './secrets-panel';
 
 // Export components for direct use
-export { HttprexBlockElement } from './httprex-block';
-export { HttprexRequestElement } from './request-editor';
-export { HttprexResponseElement } from './response-viewer';
-export { HttprexVariablePanelElement } from './variable-panel';
+export { HttpRexBlockElement } from './httprex-block';
+export { HttpRexRequestElement } from './request-editor';
+export { HttpRexResponseElement } from './response-viewer';
+export { HttpRexVariablePanelElement } from './variable-panel';
+export { HttpRexEnvironmentSelectorElement } from './environment-selector';
+export { HttpRexSecretsPanelElement } from './secrets-panel';
 
 // Export styles
 export { sharedStyles, getMethodColor, getStatusColor } from './styles';

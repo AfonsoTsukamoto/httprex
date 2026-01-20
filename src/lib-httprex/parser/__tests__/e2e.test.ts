@@ -138,7 +138,7 @@ POST https://api.example.com/users`;
 GET {{apiUrl}}/user HTTP/1.1
 Accept: application/vnd.github.v3+json
 Authorization: Bearer {{token}}
-User-Agent: Httprex/2.0`;
+User-Agent: HttpRex/2.0`;
 
       const result = httpParser.parseFile(text);
 

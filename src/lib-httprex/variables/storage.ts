@@ -219,7 +219,7 @@ export class ChromeStorageVariableStorage implements VariableStorage {
 
 /**
  * Global variable storage instance
- * Can be configured via Httprex.init()
+ * Can be configured via HttpRex.init()
  */
 let globalStorage: VariableStorage = new InMemoryVariableStorage();
 

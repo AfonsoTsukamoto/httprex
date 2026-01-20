@@ -18,6 +18,7 @@ export default defineConfig({
         // Chrome extension files
         'chrome-extension-content': resolve(__dirname, 'src/chrome-extension/content.ts'),
         'chrome-extension-background': resolve(__dirname, 'src/chrome-extension/background.ts'),
+        'chrome-extension-popup': resolve(__dirname, 'src/chrome-extension/popup.ts'),
       },
       output: {
         entryFileNames: (chunk) => {
@@ -27,6 +28,9 @@ export default defineConfig({
           }
           if (chunk.name === 'chrome-extension-background') {
             return 'chrome-extension/background.js';
+          }
+          if (chunk.name === 'chrome-extension-popup') {
+            return 'chrome-extension/popup.js';
           }
           // Default output path
           return `assets/${chunk.name}.js`;

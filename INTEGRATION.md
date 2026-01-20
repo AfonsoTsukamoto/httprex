@@ -1,15 +1,15 @@
-# Httprex Integration Guide
+# HttpRex Integration Guide
 
 > Execute HTTP requests from markdown code blocks - like mermaid.js for API testing
 
 ## Distribution Files
 
-Httprex is distributed in multiple formats for different use cases:
+HttpRex is distributed in multiple formats for different use cases:
 
 ### Core Library
 
 - **`httprex.mjs`** (35KB) - ES Module format for modern bundlers and browsers
-- **`httprex.js`** (38KB) - IIFE format for `<script>` tags (exposes `window.Httprex`)
+- **`httprex.js`** (38KB) - IIFE format for `<script>` tags (exposes `window.HttpRex`)
 - **`httprex.min.mjs`** (35KB) - Minified ES Module for production CDN usage
 - **`httprex.min.js`** (17KB) - Minified IIFE for production `<script>` tags
 - **Type declarations** (`dist/types/lib-httprex/index.d.ts`) - TypeScript support
@@ -33,18 +33,18 @@ yarn add httprex
 **Usage in TypeScript/JavaScript projects:**
 
 ```typescript
-import Httprex, { LocalStorageVariableStorage } from 'httprex';
+import HttpRex, { LocalStorageVariableStorage } from 'httprex';
 
 // Initialize with options
-Httprex.init({
+HttpRex.init({
   variableStorage: new LocalStorageVariableStorage(),
   selector: '.httprex'
 });
 
 // Parse and execute requests
-const result = Httprex.parse('GET https://api.github.com/users/octocat');
+const result = HttpRex.parse('GET https://api.github.com/users/octocat');
 if (result.success) {
-  const response = await Httprex.execute(result.data);
+  const response = await HttpRex.execute(result.data);
   console.log(response);
 }
 ```
@@ -62,8 +62,8 @@ Accept: application/json
 </pre>
 
 <script>
-  // Httprex is available as global variable
-  window.Httprex.init({
+  // HttpRex is available as global variable
+  window.HttpRex.init({
     startOnLoad: true,
     selector: '.httprex'
   });
@@ -76,9 +76,9 @@ Accept: application/json
 
 ```html
 <script type="module">
-  import Httprex from 'https://cdn.jsdelivr.net/npm/httprex@latest/dist/lib/httprex.min.mjs';
+  import HttpRex from 'https://cdn.jsdelivr.net/npm/httprex@latest/dist/lib/httprex.min.mjs';
 
-  Httprex.init({
+  HttpRex.init({
     startOnLoad: true,
     selector: '.httprex'
   });
@@ -111,13 +111,13 @@ Accept: application/json
 ### Obsidian Plugin
 
 ```typescript
-import Httprex from 'httprex';
+import HttpRex from 'httprex';
 import 'httprex/web-components';
 
-export default class HttprexPlugin extends Plugin {
+export default class HttpRexPlugin extends Plugin {
   async onload() {
     // Initialize with localStorage for variable persistence
-    Httprex.init({
+    HttpRex.init({
       variableStorage: new LocalStorageVariableStorage('obsidian-httprex')
     });
 
@@ -146,7 +146,7 @@ export default class HttprexPlugin extends Plugin {
     GET https://api.github.com/users/octocat
     </pre>
     <script>
-      window.Httprex.init({ startOnLoad: true });
+      window.HttpRex.init({ startOnLoad: true });
     </script>
   </body>
   </html>
@@ -160,8 +160,8 @@ export default class HttprexPlugin extends Plugin {
 ```html
 <!-- In <head> -->
 <script type="module">
-  import Httprex from 'https://cdn.jsdelivr.net/npm/httprex@latest/dist/lib/httprex.min.mjs';
-  Httprex.init({ startOnLoad: true, selector: '.language-httprex' });
+  import HttpRex from 'https://cdn.jsdelivr.net/npm/httprex@latest/dist/lib/httprex.min.mjs';
+  HttpRex.init({ startOnLoad: true, selector: '.language-httprex' });
 </script>
 
 <!-- In markdown files, code blocks are auto-discovered -->
@@ -201,7 +201,7 @@ jobs:
 ### Initialization
 
 ```typescript
-Httprex.init(options?: HttprexOptions): void
+HttpRex.init(options?: HttpRexOptions): void
 ```
 
 **Options:**
@@ -214,16 +214,16 @@ Httprex.init(options?: HttprexOptions): void
 
 ```typescript
 // Parse single request
-Httprex.parse(text: string): ParserResult<ParsedRequest>
+HttpRex.parse(text: string): ParserResult<ParsedRequest>
 
 // Parse file with multiple requests
-Httprex.parseFile(text: string): ParserResult<ParsedRequestFile>
+HttpRex.parseFile(text: string): ParserResult<ParsedRequestFile>
 ```
 
 ### Execution
 
 ```typescript
-Httprex.execute(
+HttpRex.execute(
   request: ParsedRequest,
   variables?: Record<string, string>,
   options?: ExecuteOptions
@@ -249,7 +249,7 @@ const value = await storage.get('baseUrl');
 
 ## Request Syntax
 
-Httprex uses VSCode REST Client format:
+HttpRex uses VSCode REST Client format:
 
 ### Basic Request
 
@@ -329,7 +329,7 @@ Content-Type: application/json
 
 ## CDN Options
 
-Httprex is available on multiple CDNs:
+HttpRex is available on multiple CDNs:
 
 - **jsDelivr**: `https://cdn.jsdelivr.net/npm/httprex@latest/dist/lib/`
 - **unpkg**: `https://unpkg.com/httprex@latest/dist/lib/`
@@ -342,18 +342,18 @@ Httprex is available on multiple CDNs:
 Full TypeScript definitions are included:
 
 ```typescript
-import Httprex, {
+import HttpRex, {
   ParsedRequest,
   HttpResponse,
   ExecutedRequest,
   VariableStorage,
-  HttprexOptions
+  HttpRexOptions
 } from 'httprex';
 
-const result = Httprex.parse('GET https://example.com');
+const result = HttpRex.parse('GET https://example.com');
 if (result.success) {
   const request: ParsedRequest = result.data;
-  const response: ExecutedRequest = await Httprex.execute(request);
+  const response: ExecutedRequest = await HttpRex.execute(request);
 }
 ```
 

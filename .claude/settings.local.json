@@ -18,7 +18,8 @@
       "Bash(npm run build:types:*)",
       "Bash(tsc:*)",
       "Bash(npx tsc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(tree:*)"
     ]
   }
 }

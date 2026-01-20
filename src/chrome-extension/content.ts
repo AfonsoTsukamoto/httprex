@@ -33,7 +33,7 @@ function findCodeBlocks(host: Host | null): NodeListOf<Element> | null {
 /**
  * Replace a code block element with an <httprex-block> web component
  */
-function replaceWithHttprexBlock(element: Element): void {
+function replaceWithHttpRexBlock(element: Element): void {
   // Extract the HTTP request text from the code block
   const textContent = element.textContent || '';
 
@@ -50,17 +50,17 @@ function replaceWithHttprexBlock(element: Element): void {
 /**
  * Initialize httprex blocks on the page
  */
-function initHttprexBlocks(): void {
+function initHttpRexBlocks(): void {
   const host = getURLHost(location.href);
   if (!host) return;
 
   const codeBlocks = findCodeBlocks(host);
 
   if (codeBlocks && codeBlocks.length > 0) {
-    console.log(`Httprex: Found ${codeBlocks.length} HTTP code blocks on ${host}`);
+    console.log(`HttpRex: Found ${codeBlocks.length} HTTP code blocks on ${host}`);
 
     codeBlocks.forEach(block => {
-      replaceWithHttprexBlock(block);
+      replaceWithHttpRexBlock(block);
     });
   }
 }
@@ -75,10 +75,10 @@ function pollForCodeBlocks(): void {
 
     if (codeBlocks && codeBlocks.length > 0) {
       clearInterval(jsInitChecker);
-      initHttprexBlocks();
+      initHttpRexBlocks();
     } else if (attempts >= MAX_ATTEMPTS) {
       clearInterval(jsInitChecker);
-      console.log('Httprex: No HTTP code blocks found after max attempts');
+      console.log('HttpRex: No HTTP code blocks found after max attempts');
     } else {
       attempts += 1;
     }

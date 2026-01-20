@@ -23,17 +23,18 @@ export function parseHeaders(lines: string[], startLine: number = 2): ParsedHead
   let currentHeaderValue: string = '';
 
   const finalizeHeader = () => {
-    if (currentHeaderName && currentHeaderValue) {
+    if (currentHeaderName) {
       const normalizedName = currentHeaderName.toLowerCase();
 
       // Handle duplicate headers (concatenate with comma, except for Set-Cookie)
-      if (headers[normalizedName]) {
+      if (headers[normalizedName] !== undefined) {
         if (normalizedName === 'set-cookie') {
           headers[normalizedName] = headers[normalizedName] + '\n' + currentHeaderValue;
         } else {
           headers[normalizedName] = headers[normalizedName] + ', ' + currentHeaderValue;
         }
       } else {
+        // Allow empty string values
         headers[normalizedName] = currentHeaderValue;
       }
     }

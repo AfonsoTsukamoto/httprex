@@ -17,7 +17,7 @@ export default defineConfig({
         }
         return 'httprex.min.js';
       },
-      name: 'Httprex'
+      name: 'HttpRex'
     },
     outDir: 'dist/lib',
     emptyOutDir: false, // Don't clear - append to existing builds

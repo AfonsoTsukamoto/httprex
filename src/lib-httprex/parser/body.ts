@@ -119,7 +119,7 @@ function parseFormUrlEncoded(content: string, startLine: number): ParsedBody {
   }
 
   try {
-    // Fix double-encoding bug: only encode once
+    // Parse form data without double-encoding
     const lines = trimmed.split('\n').filter(line => line.trim().length > 0);
     const params: Array<[string, string]> = [];
 
@@ -140,21 +140,19 @@ function parseFormUrlEncoded(content: string, startLine: number): ParsedBody {
         const equalsIndex = pair.indexOf('=');
         if (equalsIndex === -1) {
           // No = sign, treat whole thing as key with empty value
-          params.push([encodeURIComponent(pair.trim()), '']);
+          params.push([pair.trim(), '']);
         } else {
           const key = pair.substring(0, equalsIndex).trim();
           const value = pair.substring(equalsIndex + 1).trim();
 
-          // Only encode if not already encoded (fix double-encoding bug)
-          const encodedKey = key ? encodeURIComponent(key) : '';
-          const encodedValue = value ? encodeURIComponent(value) : '';
-
-          params.push([encodedKey, encodedValue]);
+          // Don't pre-encode - URLSearchParams will handle encoding
+          params.push([key, value]);
         }
       }
     }
 
     // Create URLSearchParams and return as string
+    // URLSearchParams handles the encoding automatically
     const urlParams = new URLSearchParams(params);
     return { body: urlParams.toString(), errors };
   } catch (error) {

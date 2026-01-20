@@ -18,7 +18,7 @@ export default defineConfig({
         // IIFE format for <script> tags
         return 'httprex.js';
       },
-      name: 'Httprex' // Global variable name for IIFE
+      name: 'HttpRex' // Global variable name for IIFE
     },
     outDir: 'dist/lib',
     emptyOutDir: true,
@@ -29,7 +29,7 @@ export default defineConfig({
         preserveModules: false,
         banner: (chunk) => {
           if (chunk.fileName.endsWith('.js')) {
-            return `/* Httprex - HTTP Request Library for Markdown */`;
+            return `/* HttpRex - HTTP Request Library for Markdown */`;
           }
           return '';
         }

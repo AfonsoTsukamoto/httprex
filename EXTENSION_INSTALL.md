@@ -1,4 +1,4 @@
-# Installing Httprex Chrome Extension
+# Installing HttpRex Chrome Extension
 
 ## Development Installation
 
@@ -58,14 +58,14 @@ The extension uses:
 
 ## Toggle Extension
 
-Click the Httprex icon in the Chrome toolbar to toggle the extension ON/OFF.
+Click the HttpRex icon in the Chrome toolbar to toggle the extension ON/OFF.
 The badge will show the current state.
 
 ## Debugging
 
-1. **Check console:** Open DevTools on GitHub/GitLab to see Httprex logs
+1. **Check console:** Open DevTools on GitHub/GitLab to see HttpRex logs
 2. **Inspect element:** Right-click on an httprex-block and select "Inspect"
-3. **Background logs:** Go to `chrome://extensions/`, find Httprex, click "service worker" link
+3. **Background logs:** Go to `chrome://extensions/`, find HttpRex, click "service worker" link
 
 ## Architecture
 

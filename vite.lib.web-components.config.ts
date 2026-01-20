@@ -12,7 +12,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/web-components/index.ts'),
       formats: ['es'],
       fileName: () => 'web-components.mjs',
-      name: 'HttprexWebComponents'
+      name: 'HttpRexWebComponents'
     },
     outDir: 'dist/lib',
     emptyOutDir: false, // Don't clear - append to existing builds
@@ -21,7 +21,7 @@ export default defineConfig({
       output: {
         exports: 'named',
         preserveModules: false,
-        banner: () => '/* Httprex Web Components */'
+        banner: () => '/* HttpRex Web Components */'
       }
     },
     minify: false
