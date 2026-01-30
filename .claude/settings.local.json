@@ -19,7 +19,9 @@
       "Bash(tsc:*)",
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(yarn vitest run:*)",
+      "Bash(yarn test:run:*)"
     ]
   }
 }

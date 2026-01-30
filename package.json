@@ -39,7 +39,10 @@
     "build:all": "npm run build:lib && npm run build:app",
     "preview": "vite preview",
     "test": "vitest --config vitest.config.ts",
+    "test:e2e": "vitest run test/e2e/",
+    "test:run": "vitest run --config vitest.config.ts",
     "coverage": "vitest run --coverage --config vitest.config.ts",
+    "mock-server": "npx tsx test/e2e/server/index.ts",
     "prepublishOnly": "npm run test && npm run build:lib"
   },
   "dependencies": {
@@ -50,6 +53,7 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.217",
+    "tsx": "^4.7.0",
     "@types/jest": "^29.5.14",
     "@types/jsdom": "^21.1.0",
     "@types/node": "^18.14.0",
