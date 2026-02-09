@@ -1,0 +1,42 @@
+/* HttpRex Design System — Light theme tokens */
+
+:host,
+:host([theme='light']) {
+  color-scheme: light;
+
+  --rex-color-bg: #ffffff;
+  --rex-color-surface: #ffffff;
+  --rex-color-surface-2: #f7f7f8;
+
+  --rex-color-text: #111113;
+  --rex-color-text-2: #4b4b52;
+  --rex-color-text-3: #7a7a85;
+
+  --rex-color-border: #e6e6ea;
+  --rex-color-border-2: #d7d7dd;
+
+  --rex-color-hover: rgba(17, 17, 19, 0.06);
+
+  --rex-color-accent: #111113;
+  --rex-color-accent-contrast: #ffffff;
+
+  --rex-color-warning-bg: #fff6db;
+  --rex-color-warning-border: #f0c75e;
+  --rex-color-warning-text: #7a5600;
+
+  /* Code/terminal */
+  --rex-color-code-bg: #111113;
+  --rex-color-code-text: #f2f2f3;
+  --rex-color-code-muted: rgba(242, 242, 243, 0.70);
+
+  /* Method colors */
+  --rex-method-get: #1f9d55;
+  --rex-method-post: #1c6ef2;
+  --rex-method-put: #f59e0b;
+  --rex-method-delete: #ef4444;
+  --rex-method-patch: #7c3aed;
+
+  --rex-status-ok: #16a34a;
+  --rex-status-warn: #f59e0b;
+  --rex-status-error: #ef4444;
+}
