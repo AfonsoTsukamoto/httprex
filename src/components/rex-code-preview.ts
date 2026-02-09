@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
-import { defineElement } from '../design-system/define';
+import { defineElement } from '../utils/define';
 import { rexTokens } from '../tokens/tokens';
 
 export class RexCodePreview extends LitElement {

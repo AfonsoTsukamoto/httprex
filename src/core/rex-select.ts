@@ -1,6 +1,6 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
-import { defineElement } from '../design-system/define';
+import { defineElement } from '../utils/define';
 import { rexTokens } from '../tokens/tokens';
 
 export class RexSelect extends LitElement {
@@ -71,7 +71,7 @@ export class RexSelect extends LitElement {
 
   render() {
     return html`<span class="wrap" part="wrap">
-      <select part="select" .value=${this.value} @change=${this._onChange}>
+      <select part="select" .value=${this.value} @change=${this._onChange} aria-label=${this.getAttribute('aria-label') ?? nothing}>
         <slot></slot>
       </select>
       <span class="chev" part="chev"><rex-icon name="chevron-down"></rex-icon></span>

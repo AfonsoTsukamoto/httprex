@@ -13,9 +13,9 @@
       "require": "./dist/lib/httprex.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./web-components": {
-      "import": "./dist/lib/web-components.mjs",
-      "types": "./dist/types/web-components/index.d.ts"
+    "./components": {
+      "import": "./dist/lib/components.mjs",
+      "types": "./dist/types/components/index.d.ts"
     },
     "./types": {
       "import": "./dist/lib/httprex.mjs",

@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { property, queryAssignedElements, state } from 'lit/decorators.js';
-import { defineElement } from '../design-system/define';
+import { defineElement } from '../utils/define';
 import { rexTokens } from '../tokens/tokens';
 
 export class RexTab extends LitElement {
@@ -60,6 +60,12 @@ export class RexTabs extends LitElement {
         color: var(--rex-color-text);
       }
 
+      .tab:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 var(--rex-focus-ring-width) rgba(28, 110, 242, 0.28);
+        border-radius: var(--rex-radius-xs);
+      }
+
       .tab[aria-selected='true'] {
         color: var(--rex-color-text);
         font-weight: 700;
@@ -114,6 +120,26 @@ export class RexTabs extends LitElement {
     }
   }
 
+  private _onKeyDown(e: KeyboardEvent) {
+    const tabs = this._tabs ?? [];
+    const names = tabs.map((t) => t.name);
+    const idx = names.indexOf(this.value);
+    let next = -1;
+
+    if (e.key === 'ArrowRight') next = (idx + 1) % names.length;
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + names.length) % names.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = names.length - 1;
+
+    if (next >= 0) {
+      e.preventDefault();
+      this._select(names[next]);
+      // Focus the newly selected tab button
+      const buttons = this.shadowRoot?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+      buttons?.[next]?.focus();
+    }
+  }
+
   private _select(name: string) {
     this.value = name;
     this._applyActive();
@@ -129,14 +155,16 @@ export class RexTabs extends LitElement {
           return html`<button
             class="tab"
             role="tab"
+            tabindex=${selected ? '0' : '-1'}
             aria-selected=${selected ? 'true' : 'false'}
             @click=${() => this._select(t.name)}
+            @keydown=${this._onKeyDown}
           >
             ${t.label || t.name || nothing}
           </button>`;
         })}
       </div>
-      <div class="panel">
+      <div class="panel" role="tabpanel">
         <slot @slotchange=${() => this._syncFromChildren()}></slot>
       </div>
     `;

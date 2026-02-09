@@ -1,6 +1,6 @@
 import { LitElement, css, html } from 'lit';
 import { property } from 'lit/decorators.js';
-import { defineElement } from '../design-system/define';
+import { defineElement } from '../utils/define';
 import { rexTokens } from '../tokens/tokens';
 
 export class RexToggle extends LitElement {
@@ -89,7 +89,7 @@ export class RexToggle extends LitElement {
 
   render() {
     return html`<label>
-      <input type="checkbox" ?checked=${this.checked} ?disabled=${this.disabled} @change=${this._onChange} />
+      <input type="checkbox" role="switch" aria-checked=${this.checked} ?checked=${this.checked} ?disabled=${this.disabled} @change=${this._onChange} />
       <span class="track" part="track"><span class="thumb" part="thumb"></span></span>
       <span class="text"><slot></slot></span>
     </label>`;

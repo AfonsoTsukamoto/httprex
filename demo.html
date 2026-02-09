@@ -324,7 +324,9 @@ HttpRex.init({ selector: '.language-httprex' });
   <script type="module">
     // Import and initialize httprex
     import HttpRex, { LocalStorageVariableStorage } from './src/lib-httprex/index.ts';
-    import { initAll } from './src/web-components/index.ts';
+    // Register all rex-* custom elements
+    import './src/core/index.ts';
+    import './src/components/index.ts';
 
     // Initialize httprex with localStorage for persistent variables
     HttpRex.init({

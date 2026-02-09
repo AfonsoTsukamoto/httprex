@@ -1,7 +1,7 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-import { defineElement } from '../design-system/define';
+import { defineElement } from '../utils/define';
 
 export type RexIconName =
   | 'play'

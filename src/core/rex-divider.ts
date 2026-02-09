@@ -1,5 +1,5 @@
 import { LitElement, css, html } from 'lit';
-import { defineElement } from '../design-system/define';
+import { defineElement } from '../utils/define';
 import { rexTokens } from '../tokens/tokens';
 
 export class RexDivider extends LitElement {
@@ -14,6 +14,11 @@ export class RexDivider extends LitElement {
       }
     `
   ];
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (!this.hasAttribute('role')) this.setAttribute('role', 'separator');
+  }
 
   render() {
     return html``;
