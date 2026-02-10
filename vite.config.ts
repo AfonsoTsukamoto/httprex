@@ -1,12 +1,11 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
 import { resolve } from 'path';
 import { root, assetsDir, outDir, publicDir, sharedConfig } from './vite.shared';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   ...sharedConfig,
-  plugins: [react()],
+  plugins: [],
   publicDir,
   build: {
     outDir,

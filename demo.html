@@ -123,12 +123,12 @@
       <h2>1. Simple GET Request</h2>
       <p>Basic GET request to a public API. Click "Send" to execute.</p>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 GET https://api.github.com/users/octocat
 Accept: application/json
 
-      </httprex-block>
+      </rex-request-block>
     </div>
 
     <!-- Demo 2: POST with JSON Body -->
@@ -136,7 +136,7 @@ Accept: application/json
       <h2>2. POST Request with JSON Body</h2>
       <p>POST request with JSON payload. Try it with JSONPlaceholder API.</p>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 # @name createPost
 POST https://jsonplaceholder.typicode.com/posts
@@ -147,7 +147,7 @@ Content-Type: application/json
   "body": "This is a test post created with httprex",
   "userId": 1
 }
-      </httprex-block>
+      </rex-request-block>
     </div>
 
     <!-- Demo 3: Request with Variables -->
@@ -155,7 +155,7 @@ Content-Type: application/json
       <h2>3. Request with Variables</h2>
       <p>Using file variables and system variables. The variables are highlighted in orange.</p>
 
-      <httprex-block>
+      <rex-request-block>
 @baseUrl = https://jsonplaceholder.typicode.com
 
 ###
@@ -164,7 +164,7 @@ GET {{baseUrl}}/users/1
 Accept: application/json
 X-Request-ID: {{$guid}}
 X-Timestamp: {{$timestamp}}
-      </httprex-block>
+      </rex-request-block>
 
       <div class="note">
         <strong>⚠️ Variable Warning:</strong>
@@ -177,13 +177,13 @@ X-Timestamp: {{$timestamp}}
       <h2>4. Multiple HTTP Methods</h2>
       <p>Different HTTP methods with color-coded badges.</p>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 # @name listUsers
 GET https://jsonplaceholder.typicode.com/users
-      </httprex-block>
+      </rex-request-block>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 # @name updatePost
 PUT https://jsonplaceholder.typicode.com/posts/1
@@ -195,13 +195,13 @@ Content-Type: application/json
   "body": "Updated content",
   "userId": 1
 }
-      </httprex-block>
+      </rex-request-block>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 # @name deletePost
 DELETE https://jsonplaceholder.typicode.com/posts/1
-      </httprex-block>
+      </rex-request-block>
     </div>
 
     <!-- Demo 5: Headers Showcase -->
@@ -209,7 +209,7 @@ DELETE https://jsonplaceholder.typicode.com/posts/1
       <h2>5. Custom Headers</h2>
       <p>Request with multiple custom headers.</p>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 GET https://httpbin.org/headers
 User-Agent: HttpRex/1.0
@@ -217,7 +217,7 @@ Accept: application/json
 Accept-Language: en-US,en;q=0.9
 Cache-Control: no-cache
 X-Custom-Header: test-value
-      </httprex-block>
+      </rex-request-block>
     </div>
 
     <!-- Demo 6: Form Data -->
@@ -225,7 +225,7 @@ X-Custom-Header: test-value
       <h2>6. Form URL Encoded</h2>
       <p>POST request with form-urlencoded data (fixed: no more double-encoding!).</p>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 POST https://httpbin.org/post
 Content-Type: application/x-www-form-urlencoded
@@ -233,7 +233,7 @@ Content-Type: application/x-www-form-urlencoded
 name=John Doe
 email=john@example.com
 message=Hello from httprex!
-      </httprex-block>
+      </rex-request-block>
     </div>
 
     <!-- Demo 7: Error Handling -->
@@ -241,10 +241,10 @@ message=Hello from httprex!
       <h2>7. Error Handling</h2>
       <p>Test error scenarios (404, network errors, etc.).</p>
 
-      <httprex-block>
+      <rex-request-block>
 ###
 GET https://api.github.com/users/this-user-definitely-does-not-exist-12345
-      </httprex-block>
+      </rex-request-block>
 
       <div class="note">
         <strong>💡 Tip:</strong>
