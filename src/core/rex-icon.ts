@@ -12,7 +12,8 @@ export type RexIconName =
   | 'globe'
   | 'settings'
   | 'diamond'
-  | 'code';
+  | 'code'
+  | 'layers';
 
 const ICONS: Record<RexIconName, string> = {
   play: '<path d="M8 5.75v12.5c0 .6.66.97 1.17.66l10.2-6.25c.5-.3.5-1.02 0-1.32L9.17 5.09A.77.77 0 0 0 8 5.75Z"/>' ,
@@ -32,7 +33,9 @@ const ICONS: Record<RexIconName, string> = {
     '<path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/>' +
     '<path d="M19.4 13.1a7.9 7.9 0 0 0 0-2.2l2-1.5-2-3.5-2.4.7a8 8 0 0 0-1.9-1.1L14.7 3h-4l-.4 2.5a8 8 0 0 0-2 1.1l-2.4-.7-2 3.5 2 1.5a7.9 7.9 0 0 0 0 2.2l-2 1.5 2 3.5 2.4-.7a8 8 0 0 0 2 1.1l.4 2.5h4l.4-2.5a8 8 0 0 0 1.9-1.1l2.4.7 2-3.5-2-1.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
   diamond: '<path d="M12 3L20 12L12 21L4 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
-  code: '<path d="M16 18l6-6-6-6M8 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+  code: '<path d="M16 18l6-6-6-6M8 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+  layers:
+    '<path d="M4 8h16M4 12h16M4 16h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
 };
 
 export class RexIcon extends LitElement {

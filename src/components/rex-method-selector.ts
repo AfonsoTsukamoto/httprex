@@ -51,17 +51,22 @@ export class RexMethodSelector extends LitElement {
         width: 100%;
       }
 
-      /* Nudge the native select text away so the badge reads as the selected value. */
+      /* Override rex-select inner border-radius to capsule */
       rex-select::part(select) {
         padding-left: 64px;
+        border-radius: 999px;
       }
 
-      /* Fallback if parts are not supported (still usable). */
+      rex-select::part(wrap) {
+        border-radius: 999px;
+      }
+
+      /* Fallback shim */
       .shim {
         position: absolute;
         inset: 0;
         pointer-events: none;
-        border-radius: var(--rex-radius-sm);
+        border-radius: 999px;
       }
     `
   ];

@@ -50,7 +50,25 @@ export class RexRequestBlock extends LitElement {
 
       .tools {
         display: inline-flex;
-        gap: var(--rex-space-2);
+        gap: var(--rex-space-1);
+        align-items: center;
+      }
+
+      .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 4px;
+        color: var(--rex-color-text-3);
+        transition: color var(--rex-duration-fast) var(--rex-ease), opacity var(--rex-duration-fast) var(--rex-ease);
+      }
+
+      .view-toggle:hover {
+        opacity: 0.7;
+      }
+
+      .view-toggle[data-active] {
+        color: var(--rex-color-text);
       }
 
       .stack {
@@ -78,6 +96,7 @@ export class RexRequestBlock extends LitElement {
 
   @state() private _method: RexHttpMethod = 'GET';
   @state() private _url = 'https://api.example.com/users';
+  @state() private _view: 'ui' | 'code' = 'ui';
 
   private _onUrlBarChange(e: CustomEvent<{ method: RexHttpMethod; url: string }>) {
     this._method = e.detail?.method ?? 'GET';
@@ -87,6 +106,10 @@ export class RexRequestBlock extends LitElement {
   private _onSend(e: CustomEvent<{ method: RexHttpMethod; url: string }>) {
     // This is a design-system demo component; consumers can listen to rex-send.
     this.dispatchEvent(new CustomEvent('rex-send', { detail: e.detail, bubbles: true, composed: true }));
+  }
+
+  private _setView(view: 'ui' | 'code') {
+    this._view = view;
   }
 
   render() {
@@ -101,30 +124,38 @@ export class RexRequestBlock extends LitElement {
             Request Block
           </div>
           <div class="tools">
-            <rex-button variant="icon" size="sm" theme=${theme} aria-label="Environment">
-              <span slot="icon"><rex-icon name="globe"></rex-icon></span>
-            </rex-button>
-            <rex-button variant="icon" size="sm" theme=${theme} aria-label="View code">
-              <span slot="icon"><rex-icon name="code"></rex-icon></span>
-            </rex-button>
+            <span
+              class="view-toggle"
+              ?data-active=${this._view === 'ui'}
+              @click=${() => this._setView('ui')}
+              aria-label="UI view"
+            ><rex-icon name="layers"></rex-icon></span>
+            <span
+              class="view-toggle"
+              ?data-active=${this._view === 'code'}
+              @click=${() => this._setView('code')}
+              aria-label="Code view"
+            ><rex-icon name="code"></rex-icon></span>
           </div>
         </div>
 
         <div class="stack">
-          <rex-url-bar
-            .method=${this._method}
-            .url=${this._url}
-            @rex-change=${this._onUrlBarChange}
-            @rex-send=${this._onSend}
-            theme=${theme}
-          ></rex-url-bar>
+          ${this._view === 'ui' ? html`
+            <rex-url-bar
+              .method=${this._method}
+              .url=${this._url}
+              @rex-change=${this._onUrlBarChange}
+              @rex-send=${this._onSend}
+              theme=${theme}
+            ></rex-url-bar>
 
-          <div class="two">
-            <rex-request-panel theme=${theme}></rex-request-panel>
-            <rex-response-panel theme=${theme}></rex-response-panel>
-          </div>
-
-          <rex-code-preview .value=${raw} theme=${theme} title="Raw request"></rex-code-preview>
+            <div class="two">
+              <rex-request-panel theme=${theme}></rex-request-panel>
+              <rex-response-panel theme=${theme}></rex-response-panel>
+            </div>
+          ` : html`
+            <rex-code-preview .value=${raw} theme=${theme} title="Raw request"></rex-code-preview>
+          `}
         </div>
       </div>
     `;
