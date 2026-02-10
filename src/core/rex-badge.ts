@@ -18,11 +18,11 @@ export class RexBadge extends LitElement {
         border-radius: 999px;
         font-family: var(--rex-font-sans);
         font-size: var(--rex-font-size-xs);
-        font-weight: 700;
+        font-weight: 500;
         letter-spacing: 0.02em;
         border: 1px solid var(--rex-color-border);
-        background: var(--rex-color-surface-2);
-        color: var(--rex-color-text-2);
+        background: transparent;
+        color: var(--rex-color-text-3);
         user-select: none;
         white-space: nowrap;
       }

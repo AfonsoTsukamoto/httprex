@@ -25,12 +25,12 @@ export class RexBodyEditor extends LitElement {
       .pill {
         font-family: var(--rex-font-mono);
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 500;
         padding: 2px 8px;
         border-radius: 999px;
         border: 1px solid var(--rex-color-border);
-        background: var(--rex-color-surface-2);
-        color: var(--rex-color-text-2);
+        background: transparent;
+        color: var(--rex-color-text-3);
       }
 
       rex-textarea {

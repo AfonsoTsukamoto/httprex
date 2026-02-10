@@ -78,11 +78,20 @@ export class RexButton extends LitElement {
 
       :host([variant='ghost']) button {
         background: transparent;
+        border-color: transparent;
       }
 
       :host([variant='icon']) button {
         width: 36px;
         padding: 0;
+        border-color: transparent;
+        color: var(--rex-color-text-3);
+      }
+
+      :host([variant='icon']) button:hover:not(:disabled) {
+        color: var(--rex-color-text);
+        background: var(--rex-color-hover);
+        border-color: transparent;
       }
 
       :host([variant='icon'][size='sm']) button {

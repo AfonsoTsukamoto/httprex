@@ -20,10 +20,10 @@ export class RexResponsePanel extends LitElement {
       }
 
       .card {
-        background: var(--rex-color-surface);
-        border: 1px solid var(--rex-color-border);
-        border-radius: var(--rex-radius-md);
-        padding: var(--rex-space-4);
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
       }
 
       .top {
@@ -48,7 +48,6 @@ export class RexResponsePanel extends LitElement {
       }
 
       .body {
-        border: 1px solid var(--rex-color-border);
         background: var(--rex-color-surface-2);
         border-radius: var(--rex-radius-sm);
         padding: var(--rex-space-3);
@@ -61,7 +60,6 @@ export class RexResponsePanel extends LitElement {
 
       .headers {
         margin-top: var(--rex-space-3);
-        border-top: 1px solid var(--rex-color-border);
         padding-top: var(--rex-space-3);
       }
 
@@ -72,11 +70,6 @@ export class RexResponsePanel extends LitElement {
         font-family: var(--rex-font-mono);
         font-size: 13px;
         padding: 6px 0;
-        border-bottom: 1px dashed color-mix(in srgb, var(--rex-color-border) 60%, transparent);
-      }
-
-      .headerRow:last-child {
-        border-bottom: none;
       }
 
       .k {

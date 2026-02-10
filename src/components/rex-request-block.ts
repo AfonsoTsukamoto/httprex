@@ -17,7 +17,7 @@ export class RexRequestBlock extends LitElement {
       .frame {
         background: var(--rex-color-bg);
         border: 1px solid var(--rex-color-border);
-        border-radius: var(--rex-radius-lg);
+        border-radius: var(--rex-radius-md);
         padding: var(--rex-space-5);
       }
 
@@ -30,8 +30,22 @@ export class RexRequestBlock extends LitElement {
       }
 
       .title {
-        font-weight: 800;
-        letter-spacing: -0.2px;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--rex-space-2);
+        font-size: var(--rex-font-size-sm);
+        font-weight: 500;
+        color: var(--rex-color-text-3);
+        letter-spacing: 0;
+      }
+
+      .title-icon {
+        width: 14px;
+        height: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--rex-color-text-3);
       }
 
       .tools {
@@ -82,13 +96,16 @@ export class RexRequestBlock extends LitElement {
     return html`
       <div class="frame">
         <div class="titlebar">
-          <div class="title">Request Block</div>
+          <div class="title">
+            <span class="title-icon"><rex-icon name="diamond"></rex-icon></span>
+            Request Block
+          </div>
           <div class="tools">
             <rex-button variant="icon" size="sm" theme=${theme} aria-label="Environment">
               <span slot="icon"><rex-icon name="globe"></rex-icon></span>
             </rex-button>
-            <rex-button variant="icon" size="sm" theme=${theme} aria-label="Settings">
-              <span slot="icon"><rex-icon name="settings"></rex-icon></span>
+            <rex-button variant="icon" size="sm" theme=${theme} aria-label="View code">
+              <span slot="icon"><rex-icon name="code"></rex-icon></span>
             </rex-button>
           </div>
         </div>

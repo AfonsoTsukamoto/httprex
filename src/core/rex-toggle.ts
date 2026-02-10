@@ -53,8 +53,8 @@ export class RexToggle extends LitElement {
       }
 
       :host([checked]) .track {
-        background: var(--rex-method-post);
-        border-color: color-mix(in srgb, var(--rex-method-post) 60%, transparent);
+        background: var(--rex-color-accent);
+        border-color: var(--rex-color-accent);
       }
 
       :host([checked]) .thumb {

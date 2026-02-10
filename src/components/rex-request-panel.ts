@@ -14,10 +14,10 @@ export class RexRequestPanel extends LitElement {
       }
 
       .card {
-        background: var(--rex-color-surface);
-        border: 1px solid var(--rex-color-border);
-        border-radius: var(--rex-radius-md);
-        padding: var(--rex-space-4);
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
       }
 
       rex-tabs {
