@@ -3,12 +3,12 @@
  * Tests parsing of HTTP request line: METHOD URL [HTTP/VERSION]
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'bun:test';
 import { parseRequestLine } from '../request-line';
 
 describe('parseRequestLine', () => {
   describe('Valid request lines', () => {
-    it('should parse GET request with URL', () => {
+    test('should parse GET request with URL', () => {
       const result = parseRequestLine('GET https://api.example.com/users');
 
       expect(result.data).not.toBeNull();
@@ -18,7 +18,7 @@ describe('parseRequestLine', () => {
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should parse POST request with URL and HTTP version', () => {
+    test('should parse POST request with URL and HTTP version', () => {
       const result = parseRequestLine('POST https://api.example.com/users HTTP/1.1');
 
       expect(result.data).not.toBeNull();
@@ -27,7 +27,7 @@ describe('parseRequestLine', () => {
       expect(result.data?.httpVersion).toBe('HTTP/1.1');
     });
 
-    it('should parse all supported HTTP methods', () => {
+    test('should parse all supported HTTP methods', () => {
       const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'CONNECT', 'TRACE'];
 
       methods.forEach(method => {
@@ -37,42 +37,42 @@ describe('parseRequestLine', () => {
       });
     });
 
-    it('should parse URL with query parameters', () => {
+    test('should parse URL with query parameters', () => {
       const result = parseRequestLine('GET https://api.example.com/search?q=test&limit=10');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.url).toBe('https://api.example.com/search?q=test&limit=10');
     });
 
-    it('should parse URL with path parameters', () => {
+    test('should parse URL with path parameters', () => {
       const result = parseRequestLine('GET https://api.example.com/users/123/posts/456');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.url).toBe('https://api.example.com/users/123/posts/456');
     });
 
-    it('should parse URL with fragment', () => {
+    test('should parse URL with fragment', () => {
       const result = parseRequestLine('GET https://example.com/page#section');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.url).toBe('https://example.com/page#section');
     });
 
-    it('should parse URL with port', () => {
+    test('should parse URL with port', () => {
       const result = parseRequestLine('GET http://localhost:3000/api/data');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.url).toBe('http://localhost:3000/api/data');
     });
 
-    it('should handle lowercase method names', () => {
+    test('should handle lowercase method names', () => {
       const result = parseRequestLine('get https://example.com');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.method).toBe('GET');
     });
 
-    it('should handle mixed case method names', () => {
+    test('should handle mixed case method names', () => {
       const result = parseRequestLine('GeT https://example.com');
 
       expect(result.data).not.toBeNull();
@@ -81,7 +81,7 @@ describe('parseRequestLine', () => {
   });
 
   describe('Invalid request lines', () => {
-    it('should fail on empty line', () => {
+    test('should fail on empty line', () => {
       const result = parseRequestLine('');
 
       expect(result.data).toBeNull();
@@ -89,7 +89,7 @@ describe('parseRequestLine', () => {
       expect(result.errors[0].type).toBe('SYNTAX_ERROR');
     });
 
-    it('should fail on invalid HTTP method', () => {
+    test('should fail on invalid HTTP method', () => {
       const result = parseRequestLine('INVALID https://example.com');
 
       // The implementation returns data with default GET but includes an error
@@ -98,7 +98,7 @@ describe('parseRequestLine', () => {
       expect(result.errors[0].message).toContain('INVALID');
     });
 
-    it('should default to GET for just URL', () => {
+    test('should default to GET for just URL', () => {
       const result = parseRequestLine('https://example.com');
 
       expect(result.data).not.toBeNull();
@@ -106,14 +106,14 @@ describe('parseRequestLine', () => {
       expect(result.data?.url).toBe('https://example.com');
     });
 
-    it('should fail on invalid URL (no protocol)', () => {
+    test('should fail on invalid URL (no protocol)', () => {
       const result = parseRequestLine('GET example.com/api');
 
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0].type).toBe('INVALID_URL');
     });
 
-    it('should fail on malformed URL', () => {
+    test('should fail on malformed URL', () => {
       const result = parseRequestLine('GET ht!tp://invalid');
 
       expect(result.errors).toHaveLength(1);
@@ -122,7 +122,7 @@ describe('parseRequestLine', () => {
   });
 
   describe('Edge cases', () => {
-    it('should handle extra whitespace between parts', () => {
+    test('should handle extra whitespace between parts', () => {
       const result = parseRequestLine('GET    https://example.com    HTTP/1.1');
 
       expect(result.data).not.toBeNull();
@@ -131,28 +131,28 @@ describe('parseRequestLine', () => {
       expect(result.data?.httpVersion).toBe('HTTP/1.1');
     });
 
-    it('should handle leading whitespace', () => {
+    test('should handle leading whitespace', () => {
       const result = parseRequestLine('   GET https://example.com');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.method).toBe('GET');
     });
 
-    it('should handle trailing whitespace', () => {
+    test('should handle trailing whitespace', () => {
       const result = parseRequestLine('GET https://example.com   ');
 
       expect(result.data).not.toBeNull();
       expect(result.data?.url).toBe('https://example.com');
     });
 
-    it('should include line number in errors', () => {
+    test('should include line number in errors', () => {
       const result = parseRequestLine('INVALID https://example.com');
 
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.errors[0].line).toBe(1);
     });
 
-    it('should handle HTTP/2 version', () => {
+    test('should handle HTTP/2 version', () => {
       const result = parseRequestLine('GET https://example.com HTTP/2');
 
       expect(result.data).not.toBeNull();
@@ -160,7 +160,7 @@ describe('parseRequestLine', () => {
       // HTTP/2 without decimal might not match, let's check actual behavior
     });
 
-    it('should handle URLs with variables', () => {
+    test('should handle URLs with variables', () => {
       const result = parseRequestLine('GET https://{{baseUrl}}/users/{{userId}}');
 
       expect(result.data).not.toBeNull();
@@ -169,23 +169,23 @@ describe('parseRequestLine', () => {
   });
 
   describe('Protocol variations', () => {
-    it('should accept https URLs', () => {
+    test('should accept https URLs', () => {
       const result = parseRequestLine('GET https://example.com');
       expect(result.data).not.toBeNull();
     });
 
-    it('should accept http URLs', () => {
+    test('should accept http URLs', () => {
       const result = parseRequestLine('GET http://example.com');
       expect(result.data).not.toBeNull();
     });
 
-    it('should accept absolute path URLs', () => {
+    test('should accept absolute path URLs', () => {
       const result = parseRequestLine('GET /api/users');
       expect(result.data).not.toBeNull();
       expect(result.data?.url).toBe('/api/users');
     });
 
-    it('should accept URLs with variables in host', () => {
+    test('should accept URLs with variables in host', () => {
       const result = parseRequestLine('GET {{baseUrl}}/users');
       expect(result.data).not.toBeNull();
     });

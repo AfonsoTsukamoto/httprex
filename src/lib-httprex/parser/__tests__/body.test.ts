@@ -3,12 +3,12 @@
  * Tests content-type aware body parsing (JSON, XML, form-urlencoded)
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'bun:test';
 import { parseBody } from '../body';
 
 describe('parseBody', () => {
   describe('JSON body', () => {
-    it('should parse simple JSON object', () => {
+    test('should parse simple JSON object', () => {
       const lines = ['{', '  "name": "John",', '  "age": 30', '}'];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -19,7 +19,7 @@ describe('parseBody', () => {
       });
     });
 
-    it('should parse JSON array', () => {
+    test('should parse JSON array', () => {
       const lines = ['[', '  {"id": 1},', '  {"id": 2}', ']'];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -30,7 +30,7 @@ describe('parseBody', () => {
       ]);
     });
 
-    it('should parse compact JSON', () => {
+    test('should parse compact JSON', () => {
       const lines = ['{"name":"John","age":30}'];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -38,7 +38,7 @@ describe('parseBody', () => {
       expect(result.body).toEqual({ name: 'John', age: 30 });
     });
 
-    it('should handle JSON with nested objects', () => {
+    test('should handle JSON with nested objects', () => {
       const lines = [
         '{',
         '  "user": {',
@@ -61,7 +61,7 @@ describe('parseBody', () => {
       });
     });
 
-    it('should handle JSON parse errors gracefully', () => {
+    test('should handle JSON parse errors gracefully', () => {
       const lines = ['{invalid json}'];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -70,7 +70,7 @@ describe('parseBody', () => {
       expect(result.errors[0].message).toContain('JSON');
     });
 
-    it('should detect application/json content type', () => {
+    test('should detect application/json content type', () => {
       const lines = ['{"key": "value"}'];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -78,7 +78,7 @@ describe('parseBody', () => {
       expect(result.body).toEqual({ key: 'value' });
     });
 
-    it('should detect application/json with charset', () => {
+    test('should detect application/json with charset', () => {
       const lines = ['{"key": "value"}'];
       const result = parseBody(lines, 'application/json; charset=utf-8', 5);
 
@@ -88,7 +88,7 @@ describe('parseBody', () => {
   });
 
   describe('XML body', () => {
-    it('should parse simple XML', () => {
+    test('should parse simple XML', () => {
       const lines = [
         '<?xml version="1.0"?>',
         '<user>',
@@ -104,7 +104,7 @@ describe('parseBody', () => {
       expect(result.body).toContain('<user>');
     });
 
-    it('should handle XML without declaration', () => {
+    test('should handle XML without declaration', () => {
       const lines = [
         '<note>',
         '  <to>User</to>',
@@ -118,21 +118,21 @@ describe('parseBody', () => {
       expect(result.body).toContain('<note>');
     });
 
-    it('should detect application/xml content type', () => {
+    test('should detect application/xml content type', () => {
       const lines = ['<root><item>value</item></root>'];
       const result = parseBody(lines, 'application/xml', 5);
 
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should detect text/xml content type', () => {
+    test('should detect text/xml content type', () => {
       const lines = ['<root><item>value</item></root>'];
       const result = parseBody(lines, 'text/xml', 5);
 
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should handle invalid XML', () => {
+    test('should handle invalid XML', () => {
       const lines = ['invalid xml content'];
       const result = parseBody(lines, 'application/xml', 5);
 
@@ -143,7 +143,7 @@ describe('parseBody', () => {
   });
 
   describe('Form URL encoded body', () => {
-    it('should parse simple form data', () => {
+    test('should parse simple form data', () => {
       const lines = [
         'name=John Doe',
         'email=john@example.com'
@@ -155,7 +155,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('name=John+Doe&email=john%40example.com');
     });
 
-    it('should handle single line form data', () => {
+    test('should handle single line form data', () => {
       const lines = ['name=John&age=30&city=New York'];
       const result = parseBody(lines, 'application/x-www-form-urlencoded', 5);
 
@@ -164,7 +164,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('name=John&age=30&city=New+York');
     });
 
-    it('should encode special characters', () => {
+    test('should encode special characters', () => {
       const lines = [
         'message=Hello World!',
         'symbols=@#$%^&*()'
@@ -177,7 +177,7 @@ describe('parseBody', () => {
       expect(result.body).toContain('%40%23%24%25');
     });
 
-    it('should handle empty values', () => {
+    test('should handle empty values', () => {
       const lines = ['key1=', 'key2=value2'];
       const result = parseBody(lines, 'application/x-www-form-urlencoded', 5);
 
@@ -185,7 +185,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('key1=&key2=value2');
     });
 
-    it('should handle values without keys', () => {
+    test('should handle values without keys', () => {
       const lines = ['=value'];
       const result = parseBody(lines, 'application/x-www-form-urlencoded', 5);
 
@@ -193,7 +193,7 @@ describe('parseBody', () => {
       expect(result.body).toContain('value');
     });
 
-    it('should NOT double-encode already encoded values', () => {
+    test('should NOT double-encode already encoded values', () => {
       const lines = ['email=john%40example.com'];
       const result = parseBody(lines, 'application/x-www-form-urlencoded', 5);
 
@@ -202,7 +202,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('email=john%2540example.com');
     });
 
-    it('should preserve line structure in multi-line form data', () => {
+    test('should preserve line structure in multi-line form data', () => {
       const lines = [
         'field1=value1',
         'field2=value2',
@@ -217,7 +217,7 @@ describe('parseBody', () => {
   });
 
   describe('Plain text body', () => {
-    it('should return text as-is for text/plain', () => {
+    test('should return text as-is for text/plain', () => {
       const lines = [
         'This is plain text.',
         'Line 2 of text.',
@@ -229,7 +229,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('This is plain text.\nLine 2 of text.\nLine 3.');
     });
 
-    it('should handle empty text body', () => {
+    test('should handle empty text body', () => {
       const lines = [''];
       const result = parseBody(lines, 'text/plain', 5);
 
@@ -237,7 +237,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('');
     });
 
-    it('should preserve whitespace in plain text', () => {
+    test('should preserve whitespace in plain text', () => {
       const lines = ['  Indented text  ', '    More indent    '];
       const result = parseBody(lines, 'text/plain', 5);
 
@@ -247,7 +247,7 @@ describe('parseBody', () => {
   });
 
   describe('Unknown/missing content type', () => {
-    it('should default to plain text when no content type', () => {
+    test('should default to plain text when no content type', () => {
       const lines = ['Some content'];
       const result = parseBody(lines, null, 5);
 
@@ -255,7 +255,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('Some content');
     });
 
-    it('should default to plain text for unknown content type', () => {
+    test('should default to plain text for unknown content type', () => {
       const lines = ['Some content'];
       const result = parseBody(lines, 'application/unknown', 5);
 
@@ -263,7 +263,7 @@ describe('parseBody', () => {
       expect(result.body).toBe('Some content');
     });
 
-    it('should return raw body when no content type', () => {
+    test('should return raw body when no content type', () => {
       const lines = ['{"key": "value"}'];
       const result = parseBody(lines, null, 5);
 
@@ -274,14 +274,14 @@ describe('parseBody', () => {
   });
 
   describe('Empty body', () => {
-    it('should handle empty lines array', () => {
+    test('should handle empty lines array', () => {
       const result = parseBody([], 'application/json', 5);
 
       expect(result.errors).toHaveLength(0);
       expect(result.body).toBeNull();
     });
 
-    it('should handle array with empty strings', () => {
+    test('should handle array with empty strings', () => {
       const lines = ['', '', ''];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -291,14 +291,14 @@ describe('parseBody', () => {
   });
 
   describe('Edge cases', () => {
-    it('should include line numbers in errors', () => {
+    test('should include line numbers in errors', () => {
       const lines = ['{invalid}'];
       const result = parseBody(lines, 'application/json', 42);
 
       expect(result.errors[0].line).toBe(42);
     });
 
-    it('should handle body with variables', () => {
+    test('should handle body with variables', () => {
       const lines = ['{"token": "{{authToken}}"}'];
       const result = parseBody(lines, 'application/json', 5);
 
@@ -306,7 +306,7 @@ describe('parseBody', () => {
       expect(result.body).toHaveProperty('token');
     });
 
-    it('should handle very large body content', () => {
+    test('should handle very large body content', () => {
       const largeArray = Array(1000).fill(0).map((_, i) => ({ id: i }));
       const lines = [JSON.stringify(largeArray)];
       const result = parseBody(lines, 'application/json', 5);
@@ -316,7 +316,7 @@ describe('parseBody', () => {
       expect(result.body).toHaveLength(1000);
     });
 
-    it('should handle multipart/form-data as plain text', () => {
+    test('should handle multipart/form-data as plain text', () => {
       const lines = [
         '------WebKitFormBoundary',
         'Content-Disposition: form-data; name="field"',
@@ -332,7 +332,7 @@ describe('parseBody', () => {
   });
 
   describe('Content-Type case sensitivity', () => {
-    it('should handle lowercase content type', () => {
+    test('should handle lowercase content type', () => {
       const lines = ['{"key": "value"}'];
       const result = parseBody(lines, 'application/json', 5);
 

@@ -38,10 +38,10 @@
     "build:types": "tsc --project tsconfig.lib.json",
     "build:all": "bun run build:lib && bun run build:app",
     "preview": "vite preview",
-    "test": "vitest --config vitest.config.ts",
-    "test:e2e": "vitest run test/e2e/",
-    "test:run": "vitest run --config vitest.config.ts",
-    "coverage": "vitest run --coverage --config vitest.config.ts",
+    "test": "bun test",
+    "test:e2e": "bun test test/e2e/",
+    "test:run": "bun test --run",
+    "coverage": "bun test --coverage",
     "mock-server": "npx tsx test/e2e/server/index.ts",
     "prepublishOnly": "bun run test && bun run build:lib"
   },
@@ -51,7 +51,6 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.217",
-    "@types/jest": "^29.5.14",
     "@types/jsdom": "^21.1.0",
     "@types/node": "^18.14.0",
     "jsdom": "^24.0.0",
@@ -59,7 +58,6 @@
     "terser": "^5.44.1",
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11",
-    "vitest": "^2.1.8"
+    "vite": "^5.4.11"
   }
 }

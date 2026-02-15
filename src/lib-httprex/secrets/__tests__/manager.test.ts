@@ -3,7 +3,7 @@
  * Tests secret provider orchestration and resolution
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach } from 'bun:test';
 import { SecretManager } from '../manager';
 import { SecretProvider, SecretReference, SecretProviderResult } from '../types';
 
@@ -35,14 +35,14 @@ describe('SecretManager', () => {
   });
 
   describe('registerProvider', () => {
-    it('should register a provider', () => {
+    test('should register a provider', () => {
       const provider = createMockProvider('test');
       manager.registerProvider({ provider });
 
       expect(manager.listProviders()).toContain('test');
     });
 
-    it('should register multiple providers', () => {
+    test('should register multiple providers', () => {
       manager.registerProvider({ provider: createMockProvider('first') });
       manager.registerProvider({ provider: createMockProvider('second') });
 
@@ -51,7 +51,7 @@ describe('SecretManager', () => {
   });
 
   describe('unregisterProvider', () => {
-    it('should remove a provider', () => {
+    test('should remove a provider', () => {
       manager.registerProvider({ provider: createMockProvider('test') });
       manager.unregisterProvider('test');
 
@@ -60,20 +60,20 @@ describe('SecretManager', () => {
   });
 
   describe('getProvider', () => {
-    it('should return registered provider', () => {
+    test('should return registered provider', () => {
       const provider = createMockProvider('test');
       manager.registerProvider({ provider });
 
       expect(manager.getProvider('test')).toBe(provider);
     });
 
-    it('should return undefined for non-existent provider', () => {
+    test('should return undefined for non-existent provider', () => {
       expect(manager.getProvider('unknown')).toBeUndefined();
     });
   });
 
   describe('getSecret', () => {
-    it('should resolve secret from provider', async () => {
+    test('should resolve secret from provider', async () => {
       const provider = createMockProvider('test', { 'api-token': 'secret123' });
       manager.registerProvider({ provider });
 
@@ -84,7 +84,7 @@ describe('SecretManager', () => {
       expect(result.provider).toBe('test');
     });
 
-    it('should return not found for missing secret', async () => {
+    test('should return not found for missing secret', async () => {
       const provider = createMockProvider('test', {});
       manager.registerProvider({ provider });
 
@@ -94,7 +94,7 @@ describe('SecretManager', () => {
       expect(result.value).toBeNull();
     });
 
-    it('should try providers in priority order', async () => {
+    test('should try providers in priority order', async () => {
       const lowPriority = createMockProvider('low', { token: 'low-value' });
       const highPriority = createMockProvider('high', { token: 'high-value' });
 
@@ -107,7 +107,7 @@ describe('SecretManager', () => {
       expect(result.provider).toBe('high');
     });
 
-    it('should skip unavailable providers', async () => {
+    test('should skip unavailable providers', async () => {
       const unavailable = createMockProvider('unavailable', { token: 'nope' }, false);
       const available = createMockProvider('available', { token: 'yes' });
 
@@ -120,7 +120,7 @@ describe('SecretManager', () => {
       expect(result.provider).toBe('available');
     });
 
-    it('should fallback to next provider when secret not found', async () => {
+    test('should fallback to next provider when secret not found', async () => {
       const empty = createMockProvider('empty', {});
       const hasSecret = createMockProvider('has-secret', { token: 'found' });
 
@@ -133,7 +133,7 @@ describe('SecretManager', () => {
       expect(result.provider).toBe('has-secret');
     });
 
-    it('should handle provider errors gracefully', async () => {
+    test('should handle provider errors gracefully', async () => {
       const errorProvider: SecretProvider = {
         name: 'error-provider',
         description: 'Provider that throws',
@@ -152,7 +152,7 @@ describe('SecretManager', () => {
   });
 
   describe('caching', () => {
-    it('should cache results by default', async () => {
+    test('should cache results by default', async () => {
       let callCount = 0;
       const provider: SecretProvider = {
         name: 'counting',
@@ -172,7 +172,7 @@ describe('SecretManager', () => {
       expect(callCount).toBe(1);
     });
 
-    it('should not cache when disabled', async () => {
+    test('should not cache when disabled', async () => {
       let callCount = 0;
       const provider: SecretProvider = {
         name: 'counting',
@@ -193,7 +193,7 @@ describe('SecretManager', () => {
       expect(callCount).toBe(2);
     });
 
-    it('should clear cache', async () => {
+    test('should clear cache', async () => {
       let callCount = 0;
       const provider: SecretProvider = {
         name: 'counting',
@@ -216,7 +216,7 @@ describe('SecretManager', () => {
   });
 
   describe('parseSecretReference', () => {
-    it('should parse secret: prefix', () => {
+    test('should parse secret: prefix', () => {
       const ref = SecretManager.parseSecretReference('secret:api-token');
 
       expect(ref).toEqual({
@@ -225,7 +225,7 @@ describe('SecretManager', () => {
       });
     });
 
-    it('should parse vault: prefix (Postman compatibility)', () => {
+    test('should parse vault: prefix (Postman compatibility)', () => {
       const ref = SecretManager.parseSecretReference('vault:my-secret');
 
       expect(ref).toEqual({
@@ -234,7 +234,7 @@ describe('SecretManager', () => {
       });
     });
 
-    it('should parse op:// prefix (1Password)', () => {
+    test('should parse op:// prefix (1Password)', () => {
       const ref = SecretManager.parseSecretReference('op://Engineering/API Keys/production');
 
       expect(ref).toEqual({
@@ -244,27 +244,27 @@ describe('SecretManager', () => {
       });
     });
 
-    it('should return null for regular variable', () => {
+    test('should return null for regular variable', () => {
       expect(SecretManager.parseSecretReference('baseUrl')).toBeNull();
       expect(SecretManager.parseSecretReference('$timestamp')).toBeNull();
     });
   });
 
   describe('isSecretReference', () => {
-    it('should return true for secret references', () => {
+    test('should return true for secret references', () => {
       expect(SecretManager.isSecretReference('secret:token')).toBe(true);
       expect(SecretManager.isSecretReference('vault:token')).toBe(true);
       expect(SecretManager.isSecretReference('op://vault/item/field')).toBe(true);
     });
 
-    it('should return false for regular variables', () => {
+    test('should return false for regular variables', () => {
       expect(SecretManager.isSecretReference('baseUrl')).toBe(false);
       expect(SecretManager.isSecretReference('token')).toBe(false);
     });
   });
 
   describe('getUnresolvedSecrets', () => {
-    it('should return unresolved secret references', async () => {
+    test('should return unresolved secret references', async () => {
       const provider = createMockProvider('test', { 'api-token': 'value' });
       manager.registerProvider({ provider });
 
@@ -280,7 +280,7 @@ describe('SecretManager', () => {
       expect(unresolved).toContain('vault:also-missing');
     });
 
-    it('should return empty array when all secrets resolved', async () => {
+    test('should return empty array when all secrets resolved', async () => {
       const provider = createMockProvider('test', { token: 'value' });
       manager.registerProvider({ provider });
 

@@ -3,12 +3,12 @@
  * Tests variable extraction and resolution
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'bun:test';
 import { extractVariables, extractFileVariables, resolveVariables } from '../lexer';
 
 describe('extractVariables', () => {
   describe('Basic variable extraction', () => {
-    it('should extract single variable', () => {
+    test('should extract single variable', () => {
       const text = 'GET https://{{baseUrl}}/users';
       const result = extractVariables(text);
 
@@ -16,7 +16,7 @@ describe('extractVariables', () => {
       expect(result.variables[0].name).toBe('baseUrl');
     });
 
-    it('should extract multiple variables', () => {
+    test('should extract multiple variables', () => {
       const text = 'GET https://{{baseUrl}}/users/{{userId}}/posts/{{postId}}';
       const result = extractVariables(text);
 
@@ -26,7 +26,7 @@ describe('extractVariables', () => {
       expect(result.variables[2].name).toBe('postId');
     });
 
-    it('should extract variables from headers', () => {
+    test('should extract variables from headers', () => {
       const text = 'Authorization: Bearer {{token}}';
       const result = extractVariables(text);
 
@@ -34,7 +34,7 @@ describe('extractVariables', () => {
       expect(result.variables[0].name).toBe('token');
     });
 
-    it('should extract variables from body', () => {
+    test('should extract variables from body', () => {
       const text = '{"email": "{{userEmail}}", "name": "{{userName}}"}';
       const result = extractVariables(text);
 
@@ -45,35 +45,35 @@ describe('extractVariables', () => {
   });
 
   describe('Variable name formats', () => {
-    it('should extract variables with underscores', () => {
+    test('should extract variables with underscores', () => {
       const text = '{{base_url}}';
       const result = extractVariables(text);
 
       expect(result.variables[0].name).toBe('base_url');
     });
 
-    it('should extract variables with hyphens', () => {
+    test('should extract variables with hyphens', () => {
       const text = '{{base-url}}';
       const result = extractVariables(text);
 
       expect(result.variables[0].name).toBe('base-url');
     });
 
-    it('should extract variables with dots', () => {
+    test('should extract variables with dots', () => {
       const text = '{{request.response.token}}';
       const result = extractVariables(text);
 
       expect(result.variables[0].name).toBe('request.response.token');
     });
 
-    it('should extract variables with numbers', () => {
+    test('should extract variables with numbers', () => {
       const text = '{{user123}}';
       const result = extractVariables(text);
 
       expect(result.variables[0].name).toBe('user123');
     });
 
-    it('should handle system variables', () => {
+    test('should handle system variables', () => {
       const text = 'X-Request-ID: {{$guid}}';
       const result = extractVariables(text);
 
@@ -82,7 +82,7 @@ describe('extractVariables', () => {
   });
 
   describe('Duplicate variables', () => {
-    it('should extract duplicate variables', () => {
+    test('should extract duplicate variables', () => {
       const text = 'GET {{baseUrl}}/users?filter={{baseUrl}}';
       const result = extractVariables(text);
 
@@ -91,7 +91,7 @@ describe('extractVariables', () => {
       expect(result.variables[1].name).toBe('baseUrl');
     });
 
-    it('should preserve order of duplicate variables', () => {
+    test('should preserve order of duplicate variables', () => {
       const text = '{{a}} {{b}} {{a}} {{c}} {{a}}';
       const result = extractVariables(text);
 
@@ -101,34 +101,34 @@ describe('extractVariables', () => {
   });
 
   describe('Edge cases', () => {
-    it('should return empty array for no variables', () => {
+    test('should return empty array for no variables', () => {
       const text = 'GET https://example.com/users';
       const result = extractVariables(text);
 
       expect(result.variables).toHaveLength(0);
     });
 
-    it('should handle empty string', () => {
+    test('should handle empty string', () => {
       const result = extractVariables('');
 
       expect(result.variables).toHaveLength(0);
     });
 
-    it('should handle incomplete variable syntax', () => {
+    test('should handle incomplete variable syntax', () => {
       const text = 'GET {{incomplete';
       const result = extractVariables(text);
 
       expect(result.variables).toHaveLength(0);
     });
 
-    it('should handle closing braces before opening', () => {
+    test('should handle closing braces before opening', () => {
       const text = 'GET }}invalid{{';
       const result = extractVariables(text);
 
       expect(result.variables).toHaveLength(0);
     });
 
-    it('should handle nested braces', () => {
+    test('should handle nested braces', () => {
       const text = '{{outer{{inner}}}}';
       const result = extractVariables(text);
 
@@ -136,14 +136,14 @@ describe('extractVariables', () => {
       expect(result.variables.length).toBeGreaterThan(0);
     });
 
-    it('should handle single braces', () => {
+    test('should handle single braces', () => {
       const text = 'GET {single}/path/{another}';
       const result = extractVariables(text);
 
       expect(result.variables).toHaveLength(0);
     });
 
-    it('should handle triple braces', () => {
+    test('should handle triple braces', () => {
       const text = 'GET {{{triple}}}';
       const result = extractVariables(text);
 
@@ -151,7 +151,7 @@ describe('extractVariables', () => {
       expect(result.variables.length).toBeGreaterThan(0);
     });
 
-    it('should handle variables with spaces (invalid but should skip)', () => {
+    test('should handle variables with spaces (invalid but should skip)', () => {
       const text = '{{ space var }}';
       const result = extractVariables(text);
 
@@ -164,7 +164,7 @@ describe('extractVariables', () => {
   });
 
   describe('Returns original text', () => {
-    it('should return the original text in result', () => {
+    test('should return the original text in result', () => {
       const text = 'GET https://{{baseUrl}}/users';
       const result = extractVariables(text);
 
@@ -175,7 +175,7 @@ describe('extractVariables', () => {
 
 describe('extractFileVariables', () => {
   describe('Basic file variable extraction', () => {
-    it('should extract single file variable', () => {
+    test('should extract single file variable', () => {
       const lines = ['@baseUrl = https://api.example.com'];
       const result = extractFileVariables(lines);
 
@@ -184,7 +184,7 @@ describe('extractFileVariables', () => {
       expect(result[0].value).toBe('https://api.example.com');
     });
 
-    it('should extract multiple file variables', () => {
+    test('should extract multiple file variables', () => {
       const lines = [
         '@baseUrl = https://api.example.com',
         '@token = abc123',
@@ -198,14 +198,14 @@ describe('extractFileVariables', () => {
       expect(result[2]).toEqual({ name: 'userId', value: '42', line: 3 });
     });
 
-    it('should trim whitespace from values', () => {
+    test('should trim whitespace from values', () => {
       const lines = ['@token =   abc123   '];
       const result = extractFileVariables(lines);
 
       expect(result[0].value).toBe('abc123');
     });
 
-    it('should handle values with equals signs', () => {
+    test('should handle values with equals signs', () => {
       const lines = ['@encoded = key=value&other=data'];
       const result = extractFileVariables(lines);
 
@@ -214,14 +214,14 @@ describe('extractFileVariables', () => {
   });
 
   describe('Variable name formats', () => {
-    it('should extract variables with underscores', () => {
+    test('should extract variables with underscores', () => {
       const lines = ['@base_url = https://example.com'];
       const result = extractFileVariables(lines);
 
       expect(result[0].name).toBe('base_url');
     });
 
-    it('should NOT extract variables with hyphens (regex uses \\w)', () => {
+    test('should NOT extract variables with hyphens (regex uses \\w)', () => {
       const lines = ['@base-url = https://example.com'];
       const result = extractFileVariables(lines);
 
@@ -229,7 +229,7 @@ describe('extractFileVariables', () => {
       expect(result).toHaveLength(0);
     });
 
-    it('should extract variables with numbers', () => {
+    test('should extract variables with numbers', () => {
       const lines = ['@api_v2 = https://api.example.com/v2'];
       const result = extractFileVariables(lines);
 
@@ -238,7 +238,7 @@ describe('extractFileVariables', () => {
   });
 
   describe('Comments and non-variable lines', () => {
-    it('should skip comment lines', () => {
+    test('should skip comment lines', () => {
       const lines = [
         '# This is a comment',
         '@baseUrl = https://api.example.com',
@@ -252,7 +252,7 @@ describe('extractFileVariables', () => {
       expect(result[1].name).toBe('token');
     });
 
-    it('should skip empty lines', () => {
+    test('should skip empty lines', () => {
       const lines = [
         '@baseUrl = https://api.example.com',
         '',
@@ -263,7 +263,7 @@ describe('extractFileVariables', () => {
       expect(result).toHaveLength(2);
     });
 
-    it('should skip non-variable lines', () => {
+    test('should skip non-variable lines', () => {
       const lines = [
         'GET https://example.com',
         '@baseUrl = https://api.example.com',
@@ -276,13 +276,13 @@ describe('extractFileVariables', () => {
   });
 
   describe('Edge cases', () => {
-    it('should handle empty array', () => {
+    test('should handle empty array', () => {
       const result = extractFileVariables([]);
 
       expect(result).toEqual([]);
     });
 
-    it('should handle variable without value', () => {
+    test('should handle variable without value', () => {
       const lines = ['@baseUrl ='];
       const result = extractFileVariables(lines);
 
@@ -290,7 +290,7 @@ describe('extractFileVariables', () => {
       expect(result).toHaveLength(0);
     });
 
-    it('should handle variable without equals sign', () => {
+    test('should handle variable without equals sign', () => {
       const lines = ['@baseUrl https://example.com'];
       const result = extractFileVariables(lines);
 
@@ -298,7 +298,7 @@ describe('extractFileVariables', () => {
       expect(result).toHaveLength(0);
     });
 
-    it('should track line numbers', () => {
+    test('should track line numbers', () => {
       const lines = [
         '# Comment',
         '@first = value1',
@@ -315,7 +315,7 @@ describe('extractFileVariables', () => {
 
 describe('resolveVariables', () => {
   describe('Basic variable resolution', () => {
-    it('should resolve single variable', () => {
+    test('should resolve single variable', () => {
       const text = 'GET https://{{baseUrl}}/users';
       const variables = { baseUrl: 'api.example.com' };
       const resolved = resolveVariables(text, variables);
@@ -323,7 +323,7 @@ describe('resolveVariables', () => {
       expect(resolved).toBe('GET https://api.example.com/users');
     });
 
-    it('should resolve multiple variables', () => {
+    test('should resolve multiple variables', () => {
       const text = 'GET https://{{baseUrl}}/users/{{userId}}';
       const variables = { baseUrl: 'api.example.com', userId: '123' };
       const resolved = resolveVariables(text, variables);
@@ -331,7 +331,7 @@ describe('resolveVariables', () => {
       expect(resolved).toBe('GET https://api.example.com/users/123');
     });
 
-    it('should resolve duplicate variables', () => {
+    test('should resolve duplicate variables', () => {
       const text = '{{name}} and {{name}}';
       const variables = { name: 'John' };
       const resolved = resolveVariables(text, variables);
@@ -341,7 +341,7 @@ describe('resolveVariables', () => {
   });
 
   describe('Unresolved variables', () => {
-    it('should leave unresolved variables unchanged', () => {
+    test('should leave unresolved variables unchanged', () => {
       const text = 'GET https://{{baseUrl}}/users';
       const variables = {};
       const resolved = resolveVariables(text, variables);
@@ -349,7 +349,7 @@ describe('resolveVariables', () => {
       expect(resolved).toBe('GET https://{{baseUrl}}/users');
     });
 
-    it('should resolve only available variables', () => {
+    test('should resolve only available variables', () => {
       const text = '{{resolved}} and {{unresolved}}';
       const variables = { resolved: 'value' };
       const resolved = resolveVariables(text, variables);
@@ -359,27 +359,27 @@ describe('resolveVariables', () => {
   });
 
   describe('Edge cases', () => {
-    it('should handle empty text', () => {
+    test('should handle empty text', () => {
       const resolved = resolveVariables('', { key: 'value' });
 
       expect(resolved).toBe('');
     });
 
-    it('should handle text with no variables', () => {
+    test('should handle text with no variables', () => {
       const text = 'GET https://example.com';
       const resolved = resolveVariables(text, { key: 'value' });
 
       expect(resolved).toBe('GET https://example.com');
     });
 
-    it('should handle empty variables object', () => {
+    test('should handle empty variables object', () => {
       const text = 'GET {{baseUrl}}';
       const resolved = resolveVariables(text, {});
 
       expect(resolved).toBe('GET {{baseUrl}}');
     });
 
-    it('should handle variable values containing braces', () => {
+    test('should handle variable values containing braces', () => {
       const text = '{{template}}';
       const variables = { template: 'value with {{nested}}' };
       const resolved = resolveVariables(text, variables);
@@ -387,7 +387,7 @@ describe('resolveVariables', () => {
       expect(resolved).toBe('value with {{nested}}');
     });
 
-    it('should handle special regex characters in variable names', () => {
+    test('should handle special regex characters in variable names', () => {
       const text = '{{var.name}}';
       const variables = { 'var.name': 'value' };
       const resolved = resolveVariables(text, variables);
@@ -395,7 +395,7 @@ describe('resolveVariables', () => {
       expect(resolved).toBe('value');
     });
 
-    it('should handle variable values with special characters', () => {
+    test('should handle variable values with special characters', () => {
       const text = '{{url}}';
       const variables = { url: 'https://example.com?a=1&b=2' };
       const resolved = resolveVariables(text, variables);
