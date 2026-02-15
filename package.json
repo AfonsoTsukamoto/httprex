@@ -13,9 +13,9 @@
       "require": "./dist/lib/httprex.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./web-components": {
-      "import": "./dist/lib/web-components.mjs",
-      "types": "./dist/types/web-components/index.d.ts"
+    "./components": {
+      "import": "./dist/lib/components.mjs",
+      "types": "./dist/types/components/index.d.ts"
     },
     "./types": {
       "import": "./dist/lib/httprex.mjs",
@@ -46,23 +46,18 @@
     "prepublishOnly": "npm run test && npm run build:lib"
   },
   "dependencies": {
-    "antd": "^5.15.0",
     "classnames": "^2.3.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "lit": "^3.3.2"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.217",
-    "tsx": "^4.7.0",
     "@types/jest": "^29.5.14",
     "@types/jsdom": "^21.1.0",
     "@types/node": "^18.14.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react-swc": "^3.7.1",
     "jsdom": "^24.0.0",
     "sass": "^1.60.0",
     "terser": "^5.44.1",
+    "tsx": "^4.7.0",
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vitest": "^2.1.8"

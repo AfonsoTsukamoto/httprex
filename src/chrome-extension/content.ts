@@ -1,9 +1,10 @@
 /**
  * Chrome Extension Content Script
- * Finds code blocks on GitHub/GitLab and replaces them with <httprex-block> web components
+ * Finds code blocks on GitHub/GitLab and replaces them with <rex-request-block> web components
  */
 
-import '../web-components'; // Register custom elements
+import '../components'; // Register custom elements
+import '../core'; // Register core elements
 import { getURLHost, Host } from '../host';
 
 const MAX_ATTEMPTS = 6;
@@ -31,14 +32,14 @@ function findCodeBlocks(host: Host | null): NodeListOf<Element> | null {
 }
 
 /**
- * Replace a code block element with an <httprex-block> web component
+ * Replace a code block element with a <rex-request-block> web component
  */
 function replaceWithHttpRexBlock(element: Element): void {
   // Extract the HTTP request text from the code block
   const textContent = element.textContent || '';
 
-  // Create httprex-block element
-  const httprexBlock = document.createElement('httprex-block');
+  // Create rex-request-block element
+  const httprexBlock = document.createElement('rex-request-block');
   httprexBlock.textContent = textContent;
 
   // Replace the original code block with our web component

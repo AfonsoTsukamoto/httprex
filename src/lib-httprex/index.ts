@@ -126,8 +126,8 @@ export class HttpRex {
       return;
     }
 
-    // Create httprex-block custom element
-    const block = document.createElement('httprex-block');
+    // Create rex-request-block custom element
+    const block = document.createElement('rex-request-block');
     block.textContent = text;
     element.appendChild(block);
   }
