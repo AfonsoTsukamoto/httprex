@@ -1,0 +1,81 @@
+/* HttpRex Design System — Dark theme tokens */
+
+:host([theme='dark']) {
+  color-scheme: dark;
+
+  --rex-color-bg: #0f0f12;
+  --rex-color-surface: #1a1a1f;
+  --rex-color-surface-2: #23232a;
+
+  --rex-color-text: #f2f2f3;
+  --rex-color-text-2: rgba(242, 242, 243, 0.78);
+  --rex-color-text-3: rgba(242, 242, 243, 0.56);
+
+  --rex-color-border: rgba(242, 242, 243, 0.14);
+  --rex-color-border-2: rgba(242, 242, 243, 0.22);
+
+  --rex-color-hover: rgba(242, 242, 243, 0.08);
+
+  --rex-color-accent: #f2f2f3;
+  --rex-color-accent-contrast: #111113;
+
+  --rex-color-warning-bg: rgba(245, 158, 11, 0.16);
+  --rex-color-warning-border: rgba(245, 158, 11, 0.55);
+  --rex-color-warning-text: #f7d17b;
+
+  /* Code/terminal */
+  --rex-color-code-bg: #0b0b0d;
+  --rex-color-code-text: #f2f2f3;
+  --rex-color-code-muted: rgba(242, 242, 243, 0.70);
+
+  /* Method colors */
+  --rex-method-get: #22c55e;
+  --rex-method-post: #60a5fa;
+  --rex-method-put: #fbbf24;
+  --rex-method-delete: #f87171;
+  --rex-method-patch: #a78bfa;
+
+  --rex-status-ok: #22c55e;
+  --rex-status-warn: #fbbf24;
+  --rex-status-error: #f87171;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host(:not([theme])) {
+    color-scheme: dark;
+
+    --rex-color-bg: #0f0f12;
+    --rex-color-surface: #1a1a1f;
+    --rex-color-surface-2: #23232a;
+
+    --rex-color-text: #f2f2f3;
+    --rex-color-text-2: rgba(242, 242, 243, 0.78);
+    --rex-color-text-3: rgba(242, 242, 243, 0.56);
+
+    --rex-color-border: rgba(242, 242, 243, 0.14);
+    --rex-color-border-2: rgba(242, 242, 243, 0.22);
+
+    --rex-color-hover: rgba(242, 242, 243, 0.08);
+
+    --rex-color-accent: #f2f2f3;
+    --rex-color-accent-contrast: #111113;
+
+    --rex-color-warning-bg: rgba(245, 158, 11, 0.16);
+    --rex-color-warning-border: rgba(245, 158, 11, 0.55);
+    --rex-color-warning-text: #f7d17b;
+
+    --rex-color-code-bg: #0b0b0d;
+    --rex-color-code-text: #f2f2f3;
+    --rex-color-code-muted: rgba(242, 242, 243, 0.70);
+
+    --rex-method-get: #22c55e;
+    --rex-method-post: #60a5fa;
+    --rex-method-put: #fbbf24;
+    --rex-method-delete: #f87171;
+    --rex-method-patch: #a78bfa;
+
+    --rex-status-ok: #22c55e;
+    --rex-status-warn: #fbbf24;
+    --rex-status-error: #f87171;
+  }
+}

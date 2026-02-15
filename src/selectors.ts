@@ -14,7 +14,6 @@ export const HOST_SELECTOR_MAP: Record<Host, Nullable<Selector>> = {
 export const findCodeBlocks = (host: Nullable<Host>, args?: Record<any, any>): Nullable<NodeListOf<Element>> => {
   if (host) {
     const selector = HOST_SELECTOR_MAP[host];
-    console.log({selector});
     if (selector) {
       if (typeof selector === 'string') {
         return document.querySelectorAll(selector);

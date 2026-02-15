@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HttpRex Demo - Interactive HTTP Requests</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .description {
+      font-size: 16px;
+      opacity: 0.8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h2 {
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .demo-section p {
+      color: #666;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .code-example {
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+    }
+
+    .note {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 16px;
+      font-size: 14px;
+      color: #856404;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    footer {
+      text-align: center;
+      color: white;
+      opacity: 0.8;
+      margin-top: 60px;
+      font-size: 14px;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🚀 HttpRex Demo</h1>
+      <p class="subtitle">Interactive HTTP Requests in Markdown</p>
+      <p class="description">
+        Like mermaid.js, but for HTTP requests. Compatible with VSCode REST Client format.
+      </p>
+    </header>
+
+    <!-- Demo 1: Simple GET Request -->
+    <div class="demo-section">
+      <h2>1. Simple GET Request</h2>
+      <p>Basic GET request to a public API. Click "Send" to execute.</p>
+
+      <rex-request-block>
+###
+GET https://api.github.com/users/octocat
+Accept: application/json
+
+      </rex-request-block>
+    </div>
+
+    <!-- Demo 2: POST with JSON Body -->
+    <div class="demo-section">
+      <h2>2. POST Request with JSON Body</h2>
+      <p>POST request with JSON payload. Try it with JSONPlaceholder API.</p>
+
+      <rex-request-block>
+###
+# @name createPost
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+
+{
+  "title": "Hello from HttpRex",
+  "body": "This is a test post created with httprex",
+  "userId": 1
+}
+      </rex-request-block>
+    </div>
+
+    <!-- Demo 3: Request with Variables -->
+    <div class="demo-section">
+      <h2>3. Request with Variables</h2>
+      <p>Using file variables and system variables. The variables are highlighted in orange.</p>
+
+      <rex-request-block>
+@baseUrl = https://jsonplaceholder.typicode.com
+
+###
+# @name getUser
+GET {{baseUrl}}/users/1
+Accept: application/json
+X-Request-ID: {{$guid}}
+X-Timestamp: {{$timestamp}}
+      </rex-request-block>
+
+      <div class="note">
+        <strong>⚠️ Variable Warning:</strong>
+        Unresolved variables will show a warning. Define them using <code>@varName = value</code> syntax.
+      </div>
+    </div>
+
+    <!-- Demo 4: Multiple Requests -->
+    <div class="demo-section">
+      <h2>4. Multiple HTTP Methods</h2>
+      <p>Different HTTP methods with color-coded badges.</p>
+
+      <rex-request-block>
+###
+# @name listUsers
+GET https://jsonplaceholder.typicode.com/users
+      </rex-request-block>
+
+      <rex-request-block>
+###
+# @name updatePost
+PUT https://jsonplaceholder.typicode.com/posts/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Updated Title",
+  "body": "Updated content",
+  "userId": 1
+}
+      </rex-request-block>
+
+      <rex-request-block>
+###
+# @name deletePost
+DELETE https://jsonplaceholder.typicode.com/posts/1
+      </rex-request-block>
+    </div>
+
+    <!-- Demo 5: Headers Showcase -->
+    <div class="demo-section">
+      <h2>5. Custom Headers</h2>
+      <p>Request with multiple custom headers.</p>
+
+      <rex-request-block>
+###
+GET https://httpbin.org/headers
+User-Agent: HttpRex/1.0
+Accept: application/json
+Accept-Language: en-US,en;q=0.9
+Cache-Control: no-cache
+X-Custom-Header: test-value
+      </rex-request-block>
+    </div>
+
+    <!-- Demo 6: Form Data -->
+    <div class="demo-section">
+      <h2>6. Form URL Encoded</h2>
+      <p>POST request with form-urlencoded data (fixed: no more double-encoding!).</p>
+
+      <rex-request-block>
+###
+POST https://httpbin.org/post
+Content-Type: application/x-www-form-urlencoded
+
+name=John Doe
+email=john@example.com
+message=Hello from httprex!
+      </rex-request-block>
+    </div>
+
+    <!-- Demo 7: Error Handling -->
+    <div class="demo-section">
+      <h2>7. Error Handling</h2>
+      <p>Test error scenarios (404, network errors, etc.).</p>
+
+      <rex-request-block>
+###
+GET https://api.github.com/users/this-user-definitely-does-not-exist-12345
+      </rex-request-block>
+
+      <div class="note">
+        <strong>💡 Tip:</strong>
+        HttpRex shows detailed error responses including status codes, timing, and error messages.
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="demo-section">
+      <h2>📚 How to Use</h2>
+      <p>Instructions for using HttpRex in your own projects.</p>
+
+      <div class="code-example">
+&lt;!-- Basic Usage --&gt;
+&lt;httprex-block&gt;
+###
+GET https://api.example.com/endpoint
+Authorization: Bearer your-token
+&lt;/httprex-block&gt;
+
+&lt;!-- With Variables --&gt;
+&lt;httprex-block&gt;
+@apiUrl = https://api.example.com
+@token = your-secret-token
+
+###
+GET {{apiUrl}}/users
+Authorization: Bearer {{token}}
+&lt;/httprex-block&gt;
+
+&lt;!-- Include the library --&gt;
+&lt;script type="module" src="path/to/httprex.js"&gt;&lt;/script&gt;
+      </div>
+
+      <h3 style="margin-top: 24px; margin-bottom: 12px; color: #333;">Programmatic API</h3>
+      <div class="code-example">
+import HttpRex from 'httprex';
+
+// Parse request
+const result = HttpRex.parse(`
+GET https://api.example.com/data
+`);
+
+// Execute request
+const response = await HttpRex.execute(result.data);
+console.log(response);
+
+// Auto-discover and init all blocks
+HttpRex.init({ selector: '.language-httprex' });
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="demo-section">
+      <h2>✨ Features</h2>
+      <ul style="color: #666; line-height: 2; margin-left: 24px;">
+        <li><strong>VSCode REST Client Compatible:</strong> Use <code>###</code> separator, <code>{{variables}}</code>, and more</li>
+        <li><strong>Variable Support:</strong> File variables (<code>@var = value</code>) and system variables (<code>$timestamp</code>, <code>$guid</code>)</li>
+        <li><strong>Execute Requests:</strong> Built-in HTTP executor with CORS handling</li>
+        <li><strong>Multiple Methods:</strong> GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS</li>
+        <li><strong>Body Formats:</strong> JSON, XML, form-urlencoded</li>
+        <li><strong>Copy as cURL:</strong> Export requests as cURL commands</li>
+        <li><strong>Framework Agnostic:</strong> Pure Web Components, works anywhere</li>
+        <li><strong>Syntax Highlighting:</strong> Variable highlighting and collapsible sections</li>
+      </ul>
+    </div>
+
+    <footer>
+      <p>Built with ❤️ using TypeScript, Web Components, and the Fetch API</p>
+      <p style="margin-top: 8px;">
+        <a href="https://github.com/anthropics/claude-code" target="_blank">Learn more about Claude Code</a>
+      </p>
+    </footer>
+  </div>
+
+  <!-- Load the library -->
+  <script type="module">
+    // Import and initialize httprex
+    import HttpRex, { LocalStorageVariableStorage } from './src/lib-httprex/index.ts';
+    // Register all rex-* custom elements
+    import './src/core/index.ts';
+    import './src/components/index.ts';
+
+    // Initialize httprex with localStorage for persistent variables
+    HttpRex.init({
+      variableStorage: new LocalStorageVariableStorage('httprex-demo')
+    });
+
+    // Initialize all httprex blocks on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('Initializing httprex blocks with localStorage...');
+        // Blocks are automatically initialized via custom elements
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(yarn build:*)",
+      "Bash(yarn install:*)",
+      "Bash(yarn test:*)",
+      "Bash(echo:*)",
+      "Bash(npx vite:*)",
+      "Bash(yarn dev:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:mermaid.js.org)",
+      "WebSearch",
+      "WebFetch(domain:docs.mermaidchart.com)",
+      "Bash(npm run build:lib:unminified:*)",
+      "Bash(yarn add:*)",
+      "Bash(npm run build:lib:minified:*)",
+      "Bash(npm run build:types:*)",
+      "Bash(tsc:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(yarn vitest run:*)",
+      "Bash(yarn test:run:*)"
+    ]
+  }
+}

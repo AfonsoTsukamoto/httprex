@@ -1,34 +1,65 @@
 {
-  "name": "md-requests",
+  "name": "httprex",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "HTTP request library for markdown - execute requests from code blocks like mermaid.js",
   "type": "module",
-  "files": "dist",
+  "main": "./dist/lib/httprex.js",
+  "module": "./dist/lib/httprex.mjs",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/httprex.mjs",
+      "require": "./dist/lib/httprex.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/lib/components.mjs",
+      "types": "./dist/types/components/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/lib/httprex.mjs",
+      "types": "./dist/types/lib-httprex/types.d.ts"
+    }
+  },
+  "files": [
+    "dist/lib",
+    "dist/types",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run build:app",
+    "build:app": "tsc && vite build",
+    "build:lib": "npm run build:lib:unminified && npm run build:lib:minified && npm run build:types",
+    "build:lib:unminified": "vite build --config vite.lib.config.ts && vite build --config vite.lib.web-components.config.ts",
+    "build:lib:minified": "vite build --config vite.lib.min.config.ts",
+    "build:types": "tsc --project tsconfig.lib.json",
+    "build:all": "npm run build:lib && npm run build:app",
     "preview": "vite preview",
     "test": "vitest --config vitest.config.ts",
-    "coverage": "vitest run --coverage --config vitest.config.ts"
+    "test:e2e": "vitest run test/e2e/",
+    "test:run": "vitest run --config vitest.config.ts",
+    "coverage": "vitest run --coverage --config vitest.config.ts",
+    "mock-server": "npx tsx test/e2e/server/index.ts",
+    "prepublishOnly": "npm run test && npm run build:lib"
   },
   "dependencies": {
-    "antd": "^5.3.3",
     "classnames": "^2.3.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "lit": "^3.3.2"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.217",
-    "@types/jest": "^29.4.0",
+    "@types/jest": "^29.5.14",
     "@types/jsdom": "^21.1.0",
     "@types/node": "^18.14.0",
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
-    "@vitejs/plugin-react-swc": "^3.0.0",
-    "jsdom": "^21.1.0",
+    "jsdom": "^24.0.0",
     "sass": "^1.60.0",
-    "typescript": "^4.9.3",
-    "vite": "^4.1.0",
-    "vitest": "^0.28.5"
+    "terser": "^5.44.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
   }
 }
