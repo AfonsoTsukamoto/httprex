@@ -30,20 +30,20 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:app",
+    "build": "bun run build:app",
     "build:app": "tsc && vite build",
-    "build:lib": "npm run build:lib:unminified && npm run build:lib:minified && npm run build:types",
+    "build:lib": "bun run build:lib:unminified && bun run build:lib:minified && bun run build:types",
     "build:lib:unminified": "vite build --config vite.lib.config.ts && vite build --config vite.lib.web-components.config.ts",
     "build:lib:minified": "vite build --config vite.lib.min.config.ts",
     "build:types": "tsc --project tsconfig.lib.json",
-    "build:all": "npm run build:lib && npm run build:app",
+    "build:all": "bun run build:lib && bun run build:app",
     "preview": "vite preview",
     "test": "vitest --config vitest.config.ts",
     "test:e2e": "vitest run test/e2e/",
     "test:run": "vitest run --config vitest.config.ts",
     "coverage": "vitest run --coverage --config vitest.config.ts",
     "mock-server": "npx tsx test/e2e/server/index.ts",
-    "prepublishOnly": "npm run test && npm run build:lib"
+    "prepublishOnly": "bun run test && bun run build:lib"
   },
   "dependencies": {
     "classnames": "^2.3.2",
