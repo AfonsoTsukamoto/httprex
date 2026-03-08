@@ -3,7 +3,7 @@
  * Tests environment variable loading and switching
  */
 
-import { describe, test, expect, beforeEach } from 'bun:test';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { EnvironmentManager } from '../environment';
 
 describe('EnvironmentManager', () => {
@@ -162,7 +162,7 @@ describe('EnvironmentManager', () => {
         staging: { baseUrl: 'https://staging.example.com' }
       });
 
-      const listener = () => {};
+      const listener = mock(() => {});
       manager.onChange(listener);
 
       manager.setCurrentEnvironment('local');
@@ -176,7 +176,7 @@ describe('EnvironmentManager', () => {
       });
       manager.setCurrentEnvironment('local');
 
-      const listener = () => {};
+      const listener = mock(() => {});
       manager.onChange(listener);
 
       manager.setCurrentEnvironment('local');
@@ -191,7 +191,7 @@ describe('EnvironmentManager', () => {
         staging: { baseUrl: 'https://staging.example.com' }
       });
 
-      const listener = () => {};
+      const listener = mock(() => {});
       const unsubscribe = manager.onChange(listener);
 
       unsubscribe();
@@ -202,7 +202,7 @@ describe('EnvironmentManager', () => {
     });
 
     test('should call onEnvironmentChange option callback', () => {
-      const callback = () => {};
+      const callback = mock(() => {});
       const managerWithCallback = new EnvironmentManager({
         onEnvironmentChange: callback
       });
@@ -257,7 +257,7 @@ describe('EnvironmentManager', () => {
       });
       manager.setCurrentEnvironment('local');
 
-      const listener = () => {};
+      const listener = mock(() => {});
       manager.onChange(listener);
 
       manager.clear();

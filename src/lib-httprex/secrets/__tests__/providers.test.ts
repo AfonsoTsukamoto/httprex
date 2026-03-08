@@ -3,7 +3,7 @@
  * Tests PromptSecretProvider and static parsing
  */
 
-import { describe, test, expect, beforeEach } from 'bun:test';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { PromptSecretProvider } from '../providers/prompt';
 
 describe('PromptSecretProvider', () => {
@@ -32,8 +32,8 @@ describe('PromptSecretProvider', () => {
       expect(result.value).toBe('secret-value');
     });
 
-    test.skip("should include secret name in prompt message", () => {
-      const promptFn = () => Promise.resolve('value');
+    test.skip("should include secret name in prompt message", async () => {
+      const promptFn = mock(() => Promise.resolve('value'));
       const provider = new PromptSecretProvider({ promptFn });
 
       await provider.getSecret({
@@ -47,7 +47,7 @@ describe('PromptSecretProvider', () => {
     });
 
     test('should use path for 1Password references in prompt', async () => {
-      const promptFn = () => Promise.resolve('value');
+      const promptFn = mock(() => Promise.resolve('value'));
       const provider = new PromptSecretProvider({ promptFn });
 
       await provider.getSecret({
@@ -91,7 +91,7 @@ describe('PromptSecretProvider', () => {
 
   describe('caching', () => {
     test('should cache prompted values by default', async () => {
-      const promptFn = () => Promise.resolve('cached-value');
+      const promptFn = mock(() => Promise.resolve('cached-value'));
       const provider = new PromptSecretProvider({ promptFn });
 
       await provider.getSecret({ type: 'secret', name: 'token' });
@@ -101,7 +101,7 @@ describe('PromptSecretProvider', () => {
     });
 
     test('should not cache when disabled', async () => {
-      const promptFn = () => Promise.resolve('value');
+      const promptFn = mock(() => Promise.resolve('value'));
       const provider = new PromptSecretProvider({
         promptFn,
         cachePrompts: false
@@ -114,7 +114,7 @@ describe('PromptSecretProvider', () => {
     });
 
     test('should use different cache keys for different types', async () => {
-      const promptFn = () => Promise.resolve('value');
+      const promptFn = mock(() => Promise.resolve('value'));
       const provider = new PromptSecretProvider({ promptFn });
 
       await provider.getSecret({ type: 'secret', name: 'token' });
@@ -124,7 +124,7 @@ describe('PromptSecretProvider', () => {
     });
 
     test('should clear cache', async () => {
-      const promptFn = () => Promise.resolve('value');
+      const promptFn = mock(() => Promise.resolve('value'));
       const provider = new PromptSecretProvider({ promptFn });
 
       await provider.getSecret({ type: 'secret', name: 'token' });
@@ -135,7 +135,7 @@ describe('PromptSecretProvider', () => {
     });
 
     test('should remove specific secret from cache', async () => {
-      const promptFn = () => Promise.resolve('value');
+      const promptFn = mock(() => Promise.resolve('value'));
       const provider = new PromptSecretProvider({ promptFn });
 
       await provider.getSecret({ type: 'secret', name: 'token1' });
