@@ -4,7 +4,6 @@
  * Tests the full flow: parsing → variable resolution → HTTP execution → response handling
  * Uses the mock DinoAPI server for reliable, fast testing.
  *
- * @vitest-environment node
  */
 
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
