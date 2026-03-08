@@ -6,20 +6,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **HttpRex** is a JavaScript library (like mermaid.js) for embedding interactive HTTP requests in markdown. It parses VSCode REST Client format (`.http` files) and renders them as executable requests in any markdown editor or webpage.
 
-**Architecture:** Standalone library (`lib-httprex`) + Web Components + Chrome extension as reference implementation
+**Architecture:** Standalone library (`lib-httprex`) + Lit Web Components (design system) + Chrome extension as reference implementation
 
 ## Common Commands
 
 ```bash
 # Development
-yarn dev              # Start Vite dev server
+bun run dev           # Start Vite dev server
 
 # Building
-yarn build            # TypeScript compilation + Vite build for all entry points
+bun run build         # TypeScript compilation + Vite build (app)
+bun run build:lib     # Build library bundles (ESM + IIFE + minified + types)
+bun run build:all     # Build everything (lib + app)
 
 # Testing
-yarn test             # Run all tests with vitest
-yarn coverage         # Run tests with coverage report
+bun test              # Run all tests with Bun test runner
+bun test --coverage   # Run tests with coverage report
+bun run test:e2e      # Run E2E tests only
 
 # After building, load the extension in Chrome:
 # 1. Navigate to chrome://extensions/
@@ -48,18 +51,23 @@ Standalone, framework-agnostic HTTP request library with:
 3. **Variables Module** (`variables/`) - Variable resolution
    - System variables (`$timestamp`, `$guid`, `$randomInt`)
    - File variables
-   - Environment support (future)
+   - Environment support
 
-### Web Components (`src/web-components/`)
+4. **Secrets Module** (`secrets/`) - Secret management
+   - Provider-based architecture (1Password CLI, 1Password Connect, Chrome encrypted, prompt)
+   - Secret manager with caching
 
-Framework-agnostic custom elements:
-- `<httprex-block>` - Main container
-- `<httprex-request>` - Request viewer/editor
-- `<httprex-response>` - Response viewer
+### Design System (`src/core/` + `src/components/`)
+
+Lit-based Web Components with CSS custom properties and light/dark theme support:
+
+- **Core primitives** (`src/core/`): `rex-button`, `rex-input`, `rex-badge`, `rex-tabs`, `rex-toggle`, `rex-icon`, `rex-select`, `rex-textarea`, `rex-tooltip`, `rex-callout`, `rex-divider`
+- **Composite components** (`src/components/`): `rex-request-block`, `rex-url-bar`, `rex-request-panel`, `rex-response-panel`, `rex-header-editor`, `rex-param-editor`, `rex-body-editor`, `rex-code-preview`, `rex-method-selector`
+- **Design tokens** (`src/tokens/`): `base.css`, `theme-light.css`, `theme-dark.css`, `tokens.ts`
 
 ### Chrome Extension (`src/chrome-extension/` - future)
 
-Reference implementation using lib-httprex + web components
+Reference implementation using lib-httprex + web components. Scaffold exists (background.ts, content.ts, popup.ts, manifest.json).
 
 ### Data Flow
 
@@ -72,15 +80,15 @@ HttpParser.parseFile() - Parses multiple requests
   ↓
 ParsedRequestFile { requests[], fileVariables, errors }
   ↓
-<httprex-block> Web Component created
+<rex-request-block> Web Component created
   ↓
 User clicks "Send"
   ↓
 VariableResolver.resolve() - Resolves {{vars}}
   ↓
-executeRequest() - Fetch API with CORS handling
+HttpRex.execute() - Fetch API with CORS handling
   ↓
-HttpResponse displayed in <httprex-response>
+HttpResponse displayed in <rex-response-panel>
 ```
 
 ### Key Files
@@ -89,17 +97,18 @@ HttpResponse displayed in <httprex-response>
 - **`src/lib-httprex/parser/index.ts`**: Main parser with `parse()` and `parseFile()`
 - **`src/lib-httprex/executor/fetch-adapter.ts`**: HTTP execution with timeout and CORS
 - **`src/lib-httprex/variables/resolver.ts`**: Variable resolution engine
-- **`src/web-components/httprex-block.ts`**: Main UI component
 - **`src/lib-httprex/types.ts`**: All TypeScript type definitions
+- **`src/components/rex-request-block.ts`**: Main UI component (wired to executor)
+- **`src/components/rex-response-panel.ts`**: Response display (status, headers, body, timing)
+- **`src/core/`**: Design system primitives
 
 ### Build System
 
-Vite is configured with **multi-entry point builds** (`vite.config.ts`):
-- `main`: React app (index.html)
-- `content`: Content script bundle
-- `background`: Background service worker
-
-Each outputs to `dist/src/pages/{name}/index.js` for Chrome extension structure.
+Vite with multiple configs:
+- `vite.config.ts` — Main app build (index.html, demo.html, Chrome extension entry points)
+- `vite.lib.config.ts` — Library ESM + IIFE bundle
+- `vite.lib.min.config.ts` — Minified library bundle
+- `vite.lib.web-components.config.ts` — Web components bundle
 
 ## Development Notes
 
@@ -111,31 +120,33 @@ Each outputs to `dist/src/pages/{name}/index.js` for Chrome extension structure.
 
 ### Parser Architecture
 
-The `HTTPParser` class uses a state machine pattern:
-- **ParseState.URL**: Parses request line (e.g., `GET /api/users HTTP/1.1`)
-- **ParseState.Header**: Parses headers until blank line
-- **ParseState.Body**: Parses request body based on Content-Type
-
-To extend parsing, modify `lib/parsers/http.ts` or implement the `Parser` interface for alternative formats.
+The parser in `src/lib-httprex/parser/` is modular:
+- `request-line.ts` — Parses `METHOD URL HTTP/VERSION`
+- `headers.ts` — Parses headers with multi-line (RFC 822) support
+- `body.ts` — Content-type aware body parsing (JSON, XML, form-urlencoded)
+- `lexer.ts` — Variable extraction (`{{varName}}`)
+- `separators.ts` — Request separation (`###`)
+- `index.ts` — Orchestrates all modules
 
 ### Testing
 
-Tests use vitest with jsdom. Parser tests are at `src/lib/parsers/http.test.ts` and selector tests at `src/selectors.test.ts`.
+Tests use Bun's built-in test runner. Test files:
+- `src/lib-httprex/parser/__tests__/*.test.ts` — Parser unit + e2e tests
+- `src/lib-httprex/variables/__tests__/*.test.ts` — Variable resolver tests
+- `src/lib-httprex/secrets/__tests__/*.test.ts` — Secret manager tests
+- `test/e2e/httprex-e2e.test.ts` — End-to-end tests with mock HTTP server
+- `src/selectors.test.ts` — Platform selector tests
 
 ## Usage Example
 
 ```html
 <!DOCTYPE html>
-<html data-httprex-auto-init>
+<html>
 <head>
   <script type="module" src="httprex.js"></script>
 </head>
 <body>
-  <httprex-block>
-###
-GET https://api.github.com/users/{{username}}
-Authorization: token {{githubToken}}
-  </httprex-block>
+  <rex-request-block></rex-request-block>
 </body>
 </html>
 ```
@@ -143,7 +154,7 @@ Authorization: token {{githubToken}}
 Or programmatically:
 
 ```javascript
-import HttpRex from 'httprex';
+import { HttpRex } from 'httprex';
 
 // Parse request
 const result = HttpRex.parse(`
@@ -174,7 +185,7 @@ console.log(executed.response);
    - Use the naming convention: `feat/<short-description>`, `fix/<short-description>`, or `chore/<short-description>`
    - Examples: `feat/web-components`, `fix/parser-multiline-body`, `chore/update-deps`
 2. **Commit often** with clear, conventional commit messages.
-3. **Run `yarn test` before pushing** — all tests must pass.
+3. **Run `bun test` before pushing** — all tests must pass.
 4. **Push the branch and create a PR** using `gh pr create` so the owner can review.
 5. **Never force-push to `main`** or merge PRs without owner approval.
 6. **Keep PRs focused** — one feature or fix per PR. If a task grows large, split it.
