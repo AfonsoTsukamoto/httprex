@@ -166,6 +166,43 @@ console.log(executed.response);
 - Comments: `#` or `//`
 - System variables: `$timestamp`, `$guid`, `$randomInt`
 
+## Git Workflow
+
+**All work MUST go through feature branches and PRs. Never commit directly to `main`.**
+
+1. **Before starting any feature or fix**, create a new branch from `main`:
+   - Use the naming convention: `feat/<short-description>`, `fix/<short-description>`, or `chore/<short-description>`
+   - Examples: `feat/web-components`, `fix/parser-multiline-body`, `chore/update-deps`
+2. **Commit often** with clear, conventional commit messages.
+3. **Run `yarn test` before pushing** — all tests must pass.
+4. **Push the branch and create a PR** using `gh pr create` so the owner can review.
+5. **Never force-push to `main`** or merge PRs without owner approval.
+6. **Keep PRs focused** — one feature or fix per PR. If a task grows large, split it.
+
+## When to Suggest Claude Code Teams
+
+Claude Code can orchestrate parallel sub-agents ("teams") for complex tasks. **Suggest using teams when:**
+
+- **Multi-file refactors** — e.g., renaming a concept across parser, executor, types, tests, and docs simultaneously
+- **Parallel independent workstreams** — e.g., writing tests for module A while implementing module B
+- **Large-scale code generation** — e.g., scaffolding multiple Web Components at once
+- **Research + implementation** — e.g., one agent researches an API/spec while another prepares the codebase
+
+**Don't suggest teams for:**
+- Single-file changes or small fixes
+- Sequential work where each step depends on the previous
+- Tasks that are quick enough to do inline
+
+When suggesting teams, explain briefly *why* parallelization helps and what each agent would do.
+
+## AI Collaboration Guidelines
+
+- **Always use plan mode (`EnterPlanMode`) for non-trivial features** — get owner sign-off on approach before writing code.
+- **Run tests after every meaningful change** — never leave the codebase in a broken state.
+- **Don't over-engineer** — implement what's asked, nothing more. Avoid speculative abstractions.
+- **Preserve existing patterns** — match the code style, naming conventions, and architecture already in use.
+- **When unsure, ask** — use `AskUserQuestion` rather than guessing at requirements or making assumptions.
+
 ## Project Status
 
 Active refactoring (v0.1.0). Core library and Web Components complete. Chrome extension integration pending.
