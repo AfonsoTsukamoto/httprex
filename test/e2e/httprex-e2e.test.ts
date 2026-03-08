@@ -4,10 +4,9 @@
  * Tests the full flow: parsing → variable resolution → HTTP execution → response handling
  * Uses the mock DinoAPI server for reliable, fast testing.
  *
- * @vitest-environment node
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
 import { createServer, Server } from 'http';
 import { dinosaurs, diets, clades, periods, Dinosaur } from './server/data';
 
@@ -208,7 +207,7 @@ beforeEach(() => {
 
 describe('HttpRex E2E Tests', () => {
   describe('GET Requests', () => {
-    it('should parse and execute a simple GET request', async () => {
+    test('should parse and execute a simple GET request', async () => {
       const request = `GET ${BASE_URL}/api/v1/dinosaurs`;
       const result = HttpRex.parse(request);
 
@@ -222,7 +221,7 @@ describe('HttpRex E2E Tests', () => {
       expect(Array.isArray((executed.response?.body as any).data)).toBe(true);
     });
 
-    it('should execute GET request with path parameter', async () => {
+    test('should execute GET request with path parameter', async () => {
       const request = `GET ${BASE_URL}/api/v1/dinosaurs/1`;
       const result = HttpRex.parse(request);
       const executed = await HttpRex.execute(result.data!);
@@ -232,7 +231,7 @@ describe('HttpRex E2E Tests', () => {
       expect(body.data.name).toBe('Tyrannosaurus Rex');
     });
 
-    it('should handle 404 errors', async () => {
+    test('should handle 404 errors', async () => {
       const request = `GET ${BASE_URL}/api/v1/dinosaurs/999`;
       const result = HttpRex.parse(request);
       const executed = await HttpRex.execute(result.data!);
@@ -241,7 +240,7 @@ describe('HttpRex E2E Tests', () => {
       expect((executed.response?.body as any).error).toContain('not found');
     });
 
-    it('should execute GET request with query parameters', async () => {
+    test('should execute GET request with query parameters', async () => {
       const request = `GET ${BASE_URL}/api/v1/dinosaurs?diet=carnivore`;
       const result = HttpRex.parse(request);
       const executed = await HttpRex.execute(result.data!);
@@ -251,7 +250,7 @@ describe('HttpRex E2E Tests', () => {
       expect(body.data.every((d: Dinosaur) => d.diet === 'carnivore')).toBe(true);
     });
 
-    it('should include custom headers in request', async () => {
+    test('should include custom headers in request', async () => {
       const request = `GET ${BASE_URL}/api/v1/echo/headers
 Authorization: Bearer test-token-123
 X-Custom-Header: custom-value`;
@@ -267,7 +266,7 @@ X-Custom-Header: custom-value`;
   });
 
   describe('POST Requests', () => {
-    it('should execute POST request with JSON body', async () => {
+    test('should execute POST request with JSON body', async () => {
       const request = `POST ${BASE_URL}/api/v1/dinosaurs
 Content-Type: application/json
 
@@ -292,7 +291,7 @@ Content-Type: application/json
       expect(body.data.id).toBeDefined();
     });
 
-    it('should handle POST validation errors', async () => {
+    test('should handle POST validation errors', async () => {
       const request = `POST ${BASE_URL}/api/v1/dinosaurs
 Content-Type: application/json
 
@@ -307,7 +306,7 @@ Content-Type: application/json
       expect((executed.response?.body as any).error).toContain('name');
     });
 
-    it('should echo back POST body and headers', async () => {
+    test('should echo back POST body and headers', async () => {
       const request = `POST ${BASE_URL}/api/v1/echo
 Content-Type: application/json
 X-Request-ID: test-123
@@ -327,7 +326,7 @@ X-Request-ID: test-123
   });
 
   describe('PUT Requests', () => {
-    it('should execute PUT request to update a dinosaur', async () => {
+    test('should execute PUT request to update a dinosaur', async () => {
       const request = `PUT ${BASE_URL}/api/v1/dinosaurs/1
 Content-Type: application/json
 
@@ -346,7 +345,7 @@ Content-Type: application/json
   });
 
   describe('DELETE Requests', () => {
-    it('should execute DELETE request', async () => {
+    test('should execute DELETE request', async () => {
       const request = `DELETE ${BASE_URL}/api/v1/dinosaurs/1`;
 
       const result = HttpRex.parse(request);
@@ -364,7 +363,7 @@ Content-Type: application/json
   });
 
   describe('Variable Resolution', () => {
-    it('should resolve file variables in request', async () => {
+    test('should resolve file variables in request', async () => {
       const request = `@baseUrl = ${BASE_URL}
 @dinoId = 2
 
@@ -388,7 +387,7 @@ GET {{baseUrl}}/api/v1/dinosaurs/{{dinoId}}`;
       expect((executed.response?.body as any).data.name).toBe('Velociraptor');
     });
 
-    it('should resolve system variables', async () => {
+    test('should resolve system variables', async () => {
       const request = `GET ${BASE_URL}/api/v1/echo/headers
 X-Request-ID: {{$guid}}
 X-Timestamp: {{$timestamp}}`;
@@ -414,7 +413,7 @@ X-Timestamp: {{$timestamp}}`;
   });
 
   describe('Multi-Request Files', () => {
-    it('should parse and execute multiple requests from a file', async () => {
+    test('should parse and execute multiple requests from a file', async () => {
       const fileContent = `@baseUrl = ${BASE_URL}
 
 ###
@@ -449,7 +448,7 @@ GET {{baseUrl}}/api/v1/clades`;
   });
 
   describe('Error Scenarios', () => {
-    it('should handle various HTTP status codes', async () => {
+    test('should handle various HTTP status codes', async () => {
       const statusCodes = [200, 201, 400, 401, 403, 404, 500];
 
       for (const code of statusCodes) {
@@ -461,7 +460,7 @@ GET {{baseUrl}}/api/v1/clades`;
       }
     });
 
-    it('should handle non-existent routes', async () => {
+    test('should handle non-existent routes', async () => {
       const request = `GET ${BASE_URL}/api/v1/nonexistent`;
       const result = HttpRex.parse(request);
       const executed = await HttpRex.execute(result.data!);
@@ -471,7 +470,7 @@ GET {{baseUrl}}/api/v1/clades`;
   });
 
   describe('Response Timing', () => {
-    it('should measure response timing', async () => {
+    test('should measure response timing', async () => {
       const request = `GET ${BASE_URL}/api/v1/delay/100`;
       const result = HttpRex.parse(request);
       const executed = await HttpRex.execute(result.data!);
@@ -482,7 +481,7 @@ GET {{baseUrl}}/api/v1/clades`;
   });
 
   describe('Content Types', () => {
-    it('should handle JSON responses', async () => {
+    test('should handle JSON responses', async () => {
       const request = `GET ${BASE_URL}/api/v1/dinosaurs/1
 Accept: application/json`;
 

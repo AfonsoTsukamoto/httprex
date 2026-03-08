@@ -3,7 +3,7 @@
  * Tests environment variable loading and switching
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { EnvironmentManager } from '../environment';
 
 describe('EnvironmentManager', () => {
@@ -14,7 +14,7 @@ describe('EnvironmentManager', () => {
   });
 
   describe('loadFromEnvFile', () => {
-    it('should load environments from JSON string', () => {
+    test('should load environments from JSON string', () => {
       const envFile = JSON.stringify({
         local: { baseUrl: 'http://localhost:3000' },
         staging: { baseUrl: 'https://staging.example.com' }
@@ -27,7 +27,7 @@ describe('EnvironmentManager', () => {
       expect(manager.hasEnvironment('staging')).toBe(true);
     });
 
-    it('should load environments from object', () => {
+    test('should load environments from object', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' },
         staging: { baseUrl: 'https://staging.example.com' }
@@ -36,7 +36,7 @@ describe('EnvironmentManager', () => {
       expect(manager.listEnvironments()).toHaveLength(2);
     });
 
-    it('should merge $shared variables into each environment', () => {
+    test('should merge $shared variables into each environment', () => {
       manager.loadFromEnvFile({
         $shared: { apiVersion: 'v1', timeout: '5000' },
         local: { baseUrl: 'http://localhost:3000' },
@@ -54,7 +54,7 @@ describe('EnvironmentManager', () => {
       expect(staging?.variables.baseUrl).toBe('https://staging.example.com');
     });
 
-    it('should allow environment-specific variables to override $shared', () => {
+    test('should allow environment-specific variables to override $shared', () => {
       manager.loadFromEnvFile({
         $shared: { apiVersion: 'v1' },
         local: { apiVersion: 'v2', baseUrl: 'http://localhost:3000' }
@@ -64,7 +64,7 @@ describe('EnvironmentManager', () => {
       expect(local?.variables.apiVersion).toBe('v2');
     });
 
-    it('should track which variables came from $shared', () => {
+    test('should track which variables came from $shared', () => {
       manager.loadFromEnvFile({
         $shared: { apiVersion: 'v1', timeout: '5000' },
         local: { baseUrl: 'http://localhost:3000' }
@@ -75,13 +75,13 @@ describe('EnvironmentManager', () => {
       expect(local?.sharedVariables).toContain('timeout');
     });
 
-    it('should throw error for invalid JSON', () => {
+    test('should throw error for invalid JSON', () => {
       expect(() => {
         manager.loadFromEnvFile('{ invalid json }');
       }).toThrow('Invalid http-client.env.json format');
     });
 
-    it('should clear existing environments when loading new file', () => {
+    test('should clear existing environments when loading new file', () => {
       manager.loadFromEnvFile({
         first: { var: 'value' }
       });
@@ -103,18 +103,18 @@ describe('EnvironmentManager', () => {
       });
     });
 
-    it('should set the current environment', () => {
+    test('should set the current environment', () => {
       manager.setCurrentEnvironment('local');
       expect(manager.getCurrentEnvironmentName()).toBe('local');
     });
 
-    it('should throw error for non-existent environment', () => {
+    test('should throw error for non-existent environment', () => {
       expect(() => {
         manager.setCurrentEnvironment('production');
       }).toThrow('Environment "production" not found');
     });
 
-    it('should allow setting to null to clear environment', () => {
+    test('should allow setting to null to clear environment', () => {
       manager.setCurrentEnvironment('local');
       manager.setCurrentEnvironment(null);
       expect(manager.getCurrentEnvironmentName()).toBeNull();
@@ -122,11 +122,11 @@ describe('EnvironmentManager', () => {
   });
 
   describe('getCurrentEnvironment', () => {
-    it('should return null when no environment set', () => {
+    test('should return null when no environment set', () => {
       expect(manager.getCurrentEnvironment()).toBeNull();
     });
 
-    it('should return the current environment object', () => {
+    test('should return the current environment object', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' }
       });
@@ -139,11 +139,11 @@ describe('EnvironmentManager', () => {
   });
 
   describe('getEnvironmentVariables', () => {
-    it('should return empty object when no environment set', () => {
+    test('should return empty object when no environment set', () => {
       expect(manager.getEnvironmentVariables()).toEqual({});
     });
 
-    it('should return variables from current environment', () => {
+    test('should return variables from current environment', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000', token: 'abc123' }
       });
@@ -156,13 +156,13 @@ describe('EnvironmentManager', () => {
   });
 
   describe('onChange', () => {
-    it('should notify listeners when environment changes', () => {
+    test('should notify listeners when environment changes', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' },
         staging: { baseUrl: 'https://staging.example.com' }
       });
 
-      const listener = vi.fn();
+      const listener = mock(() => {});
       manager.onChange(listener);
 
       manager.setCurrentEnvironment('local');
@@ -170,13 +170,13 @@ describe('EnvironmentManager', () => {
       expect(listener).toHaveBeenCalledWith('local');
     });
 
-    it('should not notify listeners when setting same environment', () => {
+    test('should not notify listeners when setting same environment', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' }
       });
       manager.setCurrentEnvironment('local');
 
-      const listener = vi.fn();
+      const listener = mock(() => {});
       manager.onChange(listener);
 
       manager.setCurrentEnvironment('local');
@@ -185,13 +185,13 @@ describe('EnvironmentManager', () => {
       expect(listener).not.toHaveBeenCalled();
     });
 
-    it('should return unsubscribe function', () => {
+    test('should return unsubscribe function', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' },
         staging: { baseUrl: 'https://staging.example.com' }
       });
 
-      const listener = vi.fn();
+      const listener = mock(() => {});
       const unsubscribe = manager.onChange(listener);
 
       unsubscribe();
@@ -201,8 +201,8 @@ describe('EnvironmentManager', () => {
       expect(listener).not.toHaveBeenCalled();
     });
 
-    it('should call onEnvironmentChange option callback', () => {
-      const callback = vi.fn();
+    test('should call onEnvironmentChange option callback', () => {
+      const callback = mock(() => {});
       const managerWithCallback = new EnvironmentManager({
         onEnvironmentChange: callback
       });
@@ -217,7 +217,7 @@ describe('EnvironmentManager', () => {
   });
 
   describe('autoSelectFirst option', () => {
-    it('should auto-select first environment when enabled', () => {
+    test('should auto-select first environment when enabled', () => {
       const autoManager = new EnvironmentManager({ autoSelectFirst: true });
 
       autoManager.loadFromEnvFile({
@@ -228,7 +228,7 @@ describe('EnvironmentManager', () => {
       expect(autoManager.getCurrentEnvironmentName()).toBe('local');
     });
 
-    it('should not auto-select when disabled', () => {
+    test('should not auto-select when disabled', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' }
       });
@@ -238,7 +238,7 @@ describe('EnvironmentManager', () => {
   });
 
   describe('clear', () => {
-    it('should clear all environments', () => {
+    test('should clear all environments', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' },
         staging: { baseUrl: 'https://staging.example.com' }
@@ -251,13 +251,13 @@ describe('EnvironmentManager', () => {
       expect(manager.getCurrentEnvironmentName()).toBeNull();
     });
 
-    it('should notify listeners when cleared', () => {
+    test('should notify listeners when cleared', () => {
       manager.loadFromEnvFile({
         local: { baseUrl: 'http://localhost:3000' }
       });
       manager.setCurrentEnvironment('local');
 
-      const listener = vi.fn();
+      const listener = mock(() => {});
       manager.onChange(listener);
 
       manager.clear();
@@ -267,11 +267,11 @@ describe('EnvironmentManager', () => {
   });
 
   describe('listEnvironments', () => {
-    it('should return empty array when no environments loaded', () => {
+    test('should return empty array when no environments loaded', () => {
       expect(manager.listEnvironments()).toEqual([]);
     });
 
-    it('should return all environment names', () => {
+    test('should return all environment names', () => {
       manager.loadFromEnvFile({
         local: { var: 'value' },
         staging: { var: 'value' },
@@ -286,7 +286,7 @@ describe('EnvironmentManager', () => {
   });
 
   describe('hasEnvironment', () => {
-    it('should return true for existing environment', () => {
+    test('should return true for existing environment', () => {
       manager.loadFromEnvFile({
         local: { var: 'value' }
       });
@@ -294,7 +294,7 @@ describe('EnvironmentManager', () => {
       expect(manager.hasEnvironment('local')).toBe(true);
     });
 
-    it('should return false for non-existent environment', () => {
+    test('should return false for non-existent environment', () => {
       expect(manager.hasEnvironment('production')).toBe(false);
     });
   });

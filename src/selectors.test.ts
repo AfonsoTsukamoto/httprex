@@ -1,16 +1,16 @@
-import { vi, afterEach, expect, test } from 'vitest';
+import { describe, test, expect, afterEach } from 'bun:test';
 import { findCodeBlocks  } from './selectors';
 import { Host } from './host';
 import { getTestDOM, TestPage } from './test/dom/loader';
 
 afterEach(async () => {
-  vi.unstubAllGlobals()
+  // Cleanup handled by test runner
 });
 
 describe('find code blocks', () => {
   test('finds code in github gist', async () => {
     const jsdom = await getTestDOM(TestPage.SIMPLE_GIST);
-    vi.stubGlobal('document', jsdom.window.document);
+    (global as any).document = jsdom.window.document;
     const found: HTMLDivElement = findCodeBlocks(Host.GITHUB)?.item(0) as HTMLDivElement;
 
     expect(found.outerHTML).toBe(
@@ -25,7 +25,7 @@ describe('find code blocks', () => {
 
   test('finds code in gitlab snippet', async () => {
     const jsdom = await getTestDOM(TestPage.SIMPLE_SNIPPET);
-    vi.stubGlobal('document', jsdom.window.document);
+    (global as any).document = jsdom.window.document;
     const found: HTMLDivElement = findCodeBlocks(Host.GITLAB)?.item(0) as HTMLDivElement;
     expect(found.outerHTML).toBe(
       '<pre class="code highlight js-syntax-highlight language-http white" lang="http" ' +

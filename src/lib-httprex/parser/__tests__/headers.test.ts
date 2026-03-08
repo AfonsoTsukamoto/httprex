@@ -3,12 +3,12 @@
  * Tests parsing of HTTP headers with multi-line support
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'bun:test';
 import { parseHeaders } from '../headers';
 
 describe('parseHeaders', () => {
   describe('Single headers', () => {
-    it('should parse simple header', () => {
+    test('should parse simple header', () => {
       const lines = ['Content-Type: application/json'];
       const result = parseHeaders(lines, 2);
 
@@ -18,7 +18,7 @@ describe('parseHeaders', () => {
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should parse multiple headers', () => {
+    test('should parse multiple headers', () => {
       const lines = [
         'Content-Type: application/json',
         'Authorization: Bearer token123',
@@ -33,7 +33,7 @@ describe('parseHeaders', () => {
       });
     });
 
-    it('should handle empty header value', () => {
+    test('should handle empty header value', () => {
       const lines = ['X-Custom-Header:'];
       const result = parseHeaders(lines, 2);
 
@@ -42,7 +42,7 @@ describe('parseHeaders', () => {
   });
 
   describe('Multi-line headers (RFC 822 continuation)', () => {
-    it('should parse multi-line header with leading space', () => {
+    test('should parse multi-line header with leading space', () => {
       const lines = [
         'Accept: application/json,',
         '  application/xml,',
@@ -57,7 +57,7 @@ describe('parseHeaders', () => {
   });
 
   describe('Duplicate headers', () => {
-    it('should concatenate duplicate headers with comma', () => {
+    test('should concatenate duplicate headers with comma', () => {
       const lines = [
         'Accept: application/json',
         'Accept: text/plain'
@@ -67,7 +67,7 @@ describe('parseHeaders', () => {
       expect(result.headers['accept']).toBe('application/json, text/plain');
     });
 
-    it('should concatenate set-cookie headers with newline', () => {
+    test('should concatenate set-cookie headers with newline', () => {
       const lines = [
         'Set-Cookie: session=abc123',
         'Set-Cookie: user=john'
@@ -80,7 +80,7 @@ describe('parseHeaders', () => {
   });
 
   describe('Header parsing termination', () => {
-    it('should stop at empty line', () => {
+    test('should stop at empty line', () => {
       const lines = [
         'Content-Type: application/json',
         '',
@@ -93,7 +93,7 @@ describe('parseHeaders', () => {
   });
 
   describe('Invalid headers', () => {
-    it('should generate error for empty header name', () => {
+    test('should generate error for empty header name', () => {
       const lines = [': value'];
       const result = parseHeaders(lines, 2);
 
@@ -101,7 +101,7 @@ describe('parseHeaders', () => {
       expect(result.errors[0].type).toBe('INVALID_HEADER');
     });
 
-    it('should generate error for header without colon', () => {
+    test('should generate error for header without colon', () => {
       const lines = ['InvalidHeaderWithoutColon'];
       const result = parseHeaders(lines, 2);
 
@@ -111,14 +111,14 @@ describe('parseHeaders', () => {
   });
 
   describe('Edge cases', () => {
-    it('should handle empty lines array', () => {
+    test('should handle empty lines array', () => {
       const result = parseHeaders([], 2);
 
       expect(Object.keys(result.headers)).toHaveLength(0);
       expect(result.errors).toHaveLength(0);
     });
 
-    it('should handle headers with variables', () => {
+    test('should handle headers with variables', () => {
       const lines = ['Authorization: Bearer {{token}}'];
       const result = parseHeaders(lines, 2);
 

@@ -3,7 +3,7 @@
  * Tests secret resolution integration
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
 import { VariableResolver } from '../resolver';
 import { secretManager, SecretManager } from '../../secrets';
 import { environmentManager } from '../environment';
@@ -51,7 +51,7 @@ describe('VariableResolver async methods', () => {
   });
 
   describe('resolveRequestAsync', () => {
-    it('should resolve regular variables', async () => {
+    test('should resolve regular variables', async () => {
       resolver.setContext({
         fromFile: { baseUrl: 'https://api.example.com' }
       });
@@ -70,7 +70,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.url).toBe('https://https://api.example.com/users');
     });
 
-    it('should resolve secret references', async () => {
+    test('should resolve secret references', async () => {
       const provider = createMockProvider('test', { 'api-token': 'secret123' });
       secretManager.registerProvider({ provider });
 
@@ -88,7 +88,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.headers.authorization).toBe('Bearer secret123');
     });
 
-    it('should resolve vault references', async () => {
+    test('should resolve vault references', async () => {
       const provider = createMockProvider('test', { 'my-secret': 'vault-value' });
       secretManager.registerProvider({ provider });
 
@@ -106,7 +106,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.headers['x-api-key']).toBe('vault-value');
     });
 
-    it('should resolve system variables', async () => {
+    test('should resolve system variables', async () => {
       const request: ParsedRequest = {
         method: 'GET',
         url: 'https://api.example.com',
@@ -124,7 +124,7 @@ describe('VariableResolver async methods', () => {
       );
     });
 
-    it('should resolve secrets in URL', async () => {
+    test('should resolve secrets in URL', async () => {
       const provider = createMockProvider('test', { 'api-host': 'secret-api.example.com' });
       secretManager.registerProvider({ provider });
 
@@ -142,7 +142,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.url).toBe('https://secret-api.example.com/users');
     });
 
-    it('should resolve secrets in string body', async () => {
+    test('should resolve secrets in string body', async () => {
       const provider = createMockProvider('test', { 'db-password': 'secret-pass' });
       secretManager.registerProvider({ provider });
 
@@ -160,7 +160,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.body).toBe('password=secret-pass&user=admin');
     });
 
-    it('should resolve secrets in object body', async () => {
+    test('should resolve secrets in object body', async () => {
       const provider = createMockProvider('test', { 'api-key': 'key123' });
       secretManager.registerProvider({ provider });
 
@@ -184,7 +184,7 @@ describe('VariableResolver async methods', () => {
       expect((resolved.body as any).nested.secret).toBe('key123');
     });
 
-    it('should leave unresolved secrets unchanged', async () => {
+    test('should leave unresolved secrets unchanged', async () => {
       // No provider registered
       const request: ParsedRequest = {
         method: 'GET',
@@ -200,7 +200,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.headers.authorization).toBe('Bearer {{secret:missing}}');
     });
 
-    it('should prioritize secrets over regular variables', async () => {
+    test('should prioritize secrets over regular variables', async () => {
       const provider = createMockProvider('test', { 'token': 'from-secret' });
       secretManager.registerProvider({ provider });
 
@@ -224,7 +224,7 @@ describe('VariableResolver async methods', () => {
   });
 
   describe('getUnresolvedVariables', () => {
-    it('should return unresolved variables', () => {
+    test('should return unresolved variables', () => {
       const request: ParsedRequest = {
         method: 'GET',
         url: 'https://{{baseUrl}}/users/{{userId}}',
@@ -241,7 +241,7 @@ describe('VariableResolver async methods', () => {
       expect(unresolved).toContain('token');
     });
 
-    it('should not include resolved variables', () => {
+    test('should not include resolved variables', () => {
       resolver.setContext({
         fromFile: { baseUrl: 'https://api.example.com' }
       });
@@ -261,7 +261,7 @@ describe('VariableResolver async methods', () => {
       expect(unresolved).toContain('userId');
     });
 
-    it('should not include system variables', () => {
+    test('should not include system variables', () => {
       const request: ParsedRequest = {
         method: 'GET',
         url: 'https://api.example.com',
@@ -276,7 +276,7 @@ describe('VariableResolver async methods', () => {
       expect(unresolved).not.toContain('$guid');
     });
 
-    it('should not include secret references', () => {
+    test('should not include secret references', () => {
       const request: ParsedRequest = {
         method: 'GET',
         url: 'https://api.example.com',
@@ -297,7 +297,7 @@ describe('VariableResolver async methods', () => {
   });
 
   describe('environment integration', () => {
-    it('should resolve variables from environment manager', async () => {
+    test('should resolve variables from environment manager', async () => {
       environmentManager.loadFromEnvFile({
         staging: { baseUrl: 'https://staging.example.com' }
       });
@@ -317,7 +317,7 @@ describe('VariableResolver async methods', () => {
       expect(resolved.url).toBe('https://staging.example.com/users');
     });
 
-    it('should allow file variables to override environment variables', async () => {
+    test('should allow file variables to override environment variables', async () => {
       environmentManager.loadFromEnvFile({
         staging: { baseUrl: 'https://staging.example.com' }
       });

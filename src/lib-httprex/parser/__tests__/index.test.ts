@@ -3,12 +3,12 @@
  * End-to-end parser integration tests
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'bun:test';
 import { httpParser } from '../index';
 
 describe('httpParser', () => {
   describe('parse() - Single request', () => {
-    it('should parse simple GET request', () => {
+    test('should parse simple GET request', () => {
       const text = `GET https://api.example.com/users`;
       const result = httpParser.parse(text);
 
@@ -19,7 +19,7 @@ describe('httpParser', () => {
       expect(result.data?.body).toBeNull();
     });
 
-    it('should parse request with headers', () => {
+    test('should parse request with headers', () => {
       const text = `GET https://api.example.com/users
 Accept: application/json
 Authorization: Bearer token123`;
@@ -33,7 +33,7 @@ Authorization: Bearer token123`;
       });
     });
 
-    it('should parse POST request with JSON body', () => {
+    test('should parse POST request with JSON body', () => {
       const text = `POST https://api.example.com/users
 Content-Type: application/json
 
@@ -52,7 +52,7 @@ Content-Type: application/json
       });
     });
 
-    it('should extract variables', () => {
+    test('should extract variables', () => {
       const text = `GET https://{{baseUrl}}/users/{{userId}}
 Authorization: Bearer {{token}}`;
 
@@ -65,7 +65,7 @@ Authorization: Bearer {{token}}`;
       expect(result.data?.variables.map(v => v.name)).toContain('token');
     });
 
-    it('should parse named request', () => {
+    test('should parse named request', () => {
       const text = `# @name getUsers
 GET https://api.example.com/users`;
 
@@ -75,7 +75,7 @@ GET https://api.example.com/users`;
       expect(result.data?.name).toBe('getUsers');
     });
 
-    it('should include raw request data', () => {
+    test('should include raw request data', () => {
       const text = `GET https://api.example.com/users
 Accept: application/json
 
@@ -90,7 +90,7 @@ Accept: application/json
   });
 
   describe('parseFile() - Multiple requests', () => {
-    it('should parse file with multiple requests', () => {
+    test('should parse file with multiple requests', () => {
       const text = `GET https://api.example.com/users
 ###
 POST https://api.example.com/users
@@ -106,7 +106,7 @@ Content-Type: application/json
       expect(result.data?.requests[1].method).toBe('POST');
     });
 
-    it('should extract file variables', () => {
+    test('should extract file variables', () => {
       const text = `@baseUrl = https://api.example.com
 @token = abc123
 
@@ -123,7 +123,7 @@ Authorization: Bearer {{token}}`;
       });
     });
 
-    it('should parse VSCode REST Client format file', () => {
+    test('should parse VSCode REST Client format file', () => {
       const text = `@baseUrl = https://api.example.com
 
 ###
@@ -158,7 +158,7 @@ DELETE {{baseUrl}}/users/123 HTTP/1.1`;
       expect(result.data?.fileVariables.baseUrl).toBe('https://api.example.com');
     });
 
-    it('should handle requests with different methods', () => {
+    test('should handle requests with different methods', () => {
       const text = `GET https://example.com/1
 ###
 POST https://example.com/2
@@ -178,7 +178,7 @@ PATCH https://example.com/5`;
   });
 
   describe('Error handling', () => {
-    it('should return errors for invalid method', () => {
+    test('should return errors for invalid method', () => {
       const text = `INVALID https://example.com`;
       const result = httpParser.parse(text);
 
@@ -187,7 +187,7 @@ PATCH https://example.com/5`;
       expect(result.errors[0].type).toBe('INVALID_METHOD');
     });
 
-    it('should return errors for invalid URL', () => {
+    test('should return errors for invalid URL', () => {
       const text = `GET not-a-valid-url`;
       const result = httpParser.parse(text);
 
@@ -196,7 +196,7 @@ PATCH https://example.com/5`;
       expect(result.errors[0].type).toBe('INVALID_URL');
     });
 
-    it('should return errors for invalid JSON body', () => {
+    test('should return errors for invalid JSON body', () => {
       const text = `POST https://example.com
 Content-Type: application/json
 
@@ -208,7 +208,7 @@ Content-Type: application/json
       expect(result.errors.some(e => e.type === 'PARSE_FAILED')).toBe(true);
     });
 
-    it('should collect multiple errors', () => {
+    test('should collect multiple errors', () => {
       const text = `INVALID not-a-url
 Content-Type: application/json
 
@@ -220,14 +220,14 @@ Content-Type: application/json
       expect(result.errors.length).toBeGreaterThan(1);
     });
 
-    it('should handle empty request', () => {
+    test('should handle empty request', () => {
       const result = httpParser.parse('');
 
       expect(result.success).toBe(false);
       expect(result.errors.length).toBeGreaterThan(0);
     });
 
-    it('should continue parsing other requests after error in multi-request file', () => {
+    test('should continue parsing other requests after error in multi-request file', () => {
       const text = `INVALID https://example.com
 ###
 GET https://example.com/valid`;
@@ -241,7 +241,7 @@ GET https://example.com/valid`;
   });
 
   describe('Complex scenarios', () => {
-    it('should parse request with query parameters', () => {
+    test('should parse request with query parameters', () => {
       const text = `GET https://api.example.com/search?q=test&limit=10&offset=0`;
       const result = httpParser.parse(text);
 
@@ -249,7 +249,7 @@ GET https://example.com/valid`;
       expect(result.data?.url).toContain('?q=test&limit=10&offset=0');
     });
 
-    it('should parse request with form-urlencoded body', () => {
+    test('should parse request with form-urlencoded body', () => {
       const text = `POST https://api.example.com/login
 Content-Type: application/x-www-form-urlencoded
 
@@ -263,7 +263,7 @@ password=secret123`;
       expect(result.data?.body).toContain('password=');
     });
 
-    it('should parse request with XML body', () => {
+    test('should parse request with XML body', () => {
       const text = `POST https://api.example.com/data
 Content-Type: application/xml
 
@@ -279,7 +279,7 @@ Content-Type: application/xml
       expect(result.data?.body).toBeTruthy();
     });
 
-    it('should parse request with multi-line headers', () => {
+    test('should parse request with multi-line headers', () => {
       const text = `GET https://api.example.com/users
 Accept: application/json,
   application/xml,
@@ -293,7 +293,7 @@ Accept: application/json,
       expect(result.data?.headers['accept']).toContain('text/plain');
     });
 
-    it('should handle comments throughout the request', () => {
+    test('should handle comments throughout the request', () => {
       const text = `# Get all users
 # @name getAllUsers
 GET https://api.example.com/users
@@ -306,7 +306,7 @@ Accept: application/json`;
       expect(result.data?.name).toBe('getAllUsers');
     });
 
-    it('should parse complex real-world example', () => {
+    test('should parse complex real-world example', () => {
       const text = `@apiUrl = https://api.github.com
 @token = ghp_xxxxxxxxxxxx
 
@@ -357,13 +357,13 @@ Content-Type: application/json
   });
 
   describe('Edge cases', () => {
-    it('should handle whitespace-only request', () => {
+    test('should handle whitespace-only request', () => {
       const result = httpParser.parse('   \n\n   \t\t   ');
 
       expect(result.success).toBe(false);
     });
 
-    it('should handle request with only comments', () => {
+    test('should handle request with only comments', () => {
       const text = `# This is a comment
 // Another comment
 # Yet another comment`;
@@ -373,7 +373,7 @@ Content-Type: application/json
       expect(result.success).toBe(false);
     });
 
-    it('should preserve HTTP version', () => {
+    test('should preserve HTTP version', () => {
       const text = `GET https://example.com HTTP/2`;
       const result = httpParser.parse(text);
 
@@ -381,7 +381,7 @@ Content-Type: application/json
       expect(result.data?.raw.requestLine).toContain('HTTP/2');
     });
 
-    it('should handle very large body', () => {
+    test('should handle very large body', () => {
       const largeObject = { data: Array(1000).fill({ id: 1, name: 'test' }) };
       const text = `POST https://example.com
 Content-Type: application/json

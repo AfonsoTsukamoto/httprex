@@ -3,12 +3,12 @@
  * Tests the full parser with real-world examples
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'bun:test';
 import { httpParser } from '../index';
 
 describe('httpParser - End-to-End', () => {
   describe('Simple requests', () => {
-    it('should parse GET request', () => {
+    test('should parse GET request', () => {
       const text = 'GET https://api.example.com/users';
       const result = httpParser.parse(text);
 
@@ -20,7 +20,7 @@ describe('httpParser - End-to-End', () => {
       }
     });
 
-    it('should parse POST with JSON body', () => {
+    test('should parse POST with JSON body', () => {
       const text = `POST https://api.example.com/users
 Content-Type: application/json
 
@@ -41,7 +41,7 @@ Content-Type: application/json
       }
     });
 
-    it('should parse request with headers', () => {
+    test('should parse request with headers', () => {
       const text = `GET https://api.example.com/users
 Authorization: Bearer token123
 Accept: application/json`;
@@ -57,7 +57,7 @@ Accept: application/json`;
   });
 
   describe('Variables', () => {
-    it('should extract variables from request', () => {
+    test('should extract variables from request', () => {
       const text = `GET https://{{baseUrl}}/users/{{userId}}
 Authorization: Bearer {{token}}`;
 
@@ -75,7 +75,7 @@ Authorization: Bearer {{token}}`;
   });
 
   describe('Multi-request files', () => {
-    it('should parse multiple requests separated by ###', () => {
+    test('should parse multiple requests separated by ###', () => {
       const text = `GET https://api.example.com/users
 ###
 POST https://api.example.com/users
@@ -93,7 +93,7 @@ Content-Type: application/json
       }
     });
 
-    it('should parse file with variables', () => {
+    test('should parse file with variables', () => {
       const text = `@baseUrl = https://api.example.com
 @token = secret123
 
@@ -110,7 +110,7 @@ Authorization: Bearer {{token}}`;
       }
     });
 
-    it('should parse named requests', () => {
+    test('should parse named requests', () => {
       const text = `# @name getUsers
 GET https://api.example.com/users
 ###
@@ -128,7 +128,7 @@ POST https://api.example.com/users`;
   });
 
   describe('Real-world examples', () => {
-    it('should parse GitHub API request', () => {
+    test('should parse GitHub API request', () => {
       const text = `@apiUrl = https://api.github.com
 @token = ghp_xxxxxxxxxxxx
 
@@ -156,7 +156,7 @@ User-Agent: HttpRex/2.0`;
       }
     });
 
-    it('should parse REST API CRUD operations', () => {
+    test('should parse REST API CRUD operations', () => {
       const text = `@baseUrl = https://jsonplaceholder.typicode.com
 
 ###
@@ -221,7 +221,7 @@ DELETE {{baseUrl}}/posts/1 HTTP/1.1`;
       }
     });
 
-    it('should parse form-urlencoded request', () => {
+    test('should parse form-urlencoded request', () => {
       const text = `POST https://api.example.com/login
 Content-Type: application/x-www-form-urlencoded
 
@@ -239,7 +239,7 @@ password=secret123`;
       }
     });
 
-    it('should parse XML request', () => {
+    test('should parse XML request', () => {
       const text = `POST https://api.example.com/data
 Content-Type: application/xml
 
@@ -260,7 +260,7 @@ Content-Type: application/xml
   });
 
   describe('Error handling', () => {
-    it('should collect errors for invalid request', () => {
+    test('should collect errors for invalid request', () => {
       const text = 'INVALID not-a-url';
       const result = httpParser.parse(text);
 
@@ -268,7 +268,7 @@ Content-Type: application/xml
       expect(result.errors.length).toBeGreaterThan(0);
     });
 
-    it('should handle malformed JSON gracefully', () => {
+    test('should handle malformed JSON gracefully', () => {
       const text = `POST https://api.example.com
 Content-Type: application/json
 
