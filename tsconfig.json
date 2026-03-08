@@ -3,7 +3,7 @@
     "target": "ESNext",
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
-    "types": ["vite/client", "vitest/globals", "chrome"],
+    "types": ["vite/client", "chrome"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "esModuleInterop": false,
@@ -20,9 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
-      "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/lib-deprecated/pages-old/*"],
-      "@components/*": ["src/lib-deprecated/components-old/*"]
+      "@assets/*": ["src/assets/*"]
     }
   },
   "include": [
