@@ -6,6 +6,9 @@ import { root, assetsDir, outDir, publicDir, sharedConfig } from './vite.shared'
 export default defineConfig({
   ...sharedConfig,
   plugins: [],
+  server: {
+    allowedHosts: ['afonsos-mac-mini.tail01a9e1.ts.net'],
+  },
   publicDir,
   build: {
     outDir,
