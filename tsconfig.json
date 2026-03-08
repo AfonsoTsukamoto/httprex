@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
-    "types": ["vite/client", "vitest/globals", "chrome"],
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "types": ["vite/client", "chrome"],
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "esModuleInterop": false,
@@ -19,9 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
-      "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/pages/*"],
-      "@components/*": ["src/components/*"]
+      "@assets/*": ["src/assets/*"]
     }
   },
   "include": [
@@ -31,6 +30,12 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "src"
+  ],
+  "exclude": [
+    "src/lib-deprecated/**/*",
+    "src/**/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
   ],
   "references": [
     { "path": "./tsconfig.node.json" }
