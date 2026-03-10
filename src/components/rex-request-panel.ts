@@ -34,6 +34,15 @@ export class RexRequestPanel extends LitElement {
   @property({ type: String }) value: 'params' | 'headers' | 'body' = 'params';
   @property({ type: String, reflect: true }) theme?: 'light' | 'dark';
 
+  /** Pass-through: header items from parent */
+  @property({ attribute: false }) headers?: RexKeyValueItem[];
+
+  /** Pass-through: param items from parent */
+  @property({ attribute: false }) params?: RexKeyValueItem[];
+
+  /** Pass-through: body text from parent */
+  @property({ attribute: false }) body?: string;
+
   private _onTabChange(e: CustomEvent<{ value: string }>) {
     const next = (e.detail?.value || 'params') as 'params' | 'headers' | 'body';
     this.value = next;
@@ -77,17 +86,17 @@ export class RexRequestPanel extends LitElement {
         <rex-tabs .value=${this.value} @rex-change=${this._onTabChange} theme=${theme}>
           <rex-tab name="params" label="Params">
             <div class="section">
-              <rex-param-editor theme=${theme} @rex-change=${this._onParamChange}></rex-param-editor>
+              <rex-param-editor theme=${theme} .items=${this.params} @rex-change=${this._onParamChange}></rex-param-editor>
             </div>
           </rex-tab>
           <rex-tab name="headers" label="Headers">
             <div class="section">
-              <rex-header-editor theme=${theme} @rex-change=${this._onHeaderChange}></rex-header-editor>
+              <rex-header-editor theme=${theme} .items=${this.headers} @rex-change=${this._onHeaderChange}></rex-header-editor>
             </div>
           </rex-tab>
           <rex-tab name="body" label="Body">
             <div class="section">
-              <rex-body-editor theme=${theme} @rex-input=${this._onBodyInput}></rex-body-editor>
+              <rex-body-editor theme=${theme} .value=${this.body} @rex-input=${this._onBodyInput}></rex-body-editor>
             </div>
           </rex-tab>
         </rex-tabs>

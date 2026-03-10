@@ -79,12 +79,44 @@ export class RexCodePreview extends LitElement {
         white-space: pre;
         overflow: auto;
       }
+
+      textarea {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: var(--rex-space-4);
+        font-family: var(--rex-font-mono);
+        font-size: 13px;
+        line-height: 1.5;
+        white-space: pre;
+        overflow: auto;
+        background: transparent;
+        color: inherit;
+        border: none;
+        outline: none;
+        resize: vertical;
+        min-height: 120px;
+      }
     `
   ];
 
   @property({ type: String }) title = 'Raw request';
   @property({ type: String }) value = 'GET https://api.example.com/users\nAccept: application/json\n\n';
   @property({ type: String, reflect: true }) theme?: 'light' | 'dark';
+  @property({ type: Boolean }) editable = false;
+
+  private _onInput(e: Event) {
+    const textarea = e.target as HTMLTextAreaElement;
+    this.value = textarea.value;
+    this.dispatchEvent(
+      new CustomEvent('rex-code-change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
 
   private async _copy() {
     try {
@@ -110,7 +142,16 @@ export class RexCodePreview extends LitElement {
             <span slot="icon"><rex-icon name="copy"></rex-icon></span>
           </rex-button>
         </div>
-        <pre><code>${this.value}</code></pre>
+        ${this.editable
+          ? html`<textarea
+              .value=${this.value}
+              @input=${this._onInput}
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+            ></textarea>`
+          : html`<pre><code>${this.value}</code></pre>`}
       </div>
     `;
   }

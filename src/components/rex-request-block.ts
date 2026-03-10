@@ -6,8 +6,12 @@ import type { RexHttpMethod } from './rex-method-selector';
 import type { RexKeyValueItem } from './rex-header-editor';
 import type { RexResponsePanel } from './rex-response-panel';
 import { HttpRex } from '../lib-httprex/index';
-import { createRequestPreview } from '../lib-httprex/executor';
-import type { ParsedRequest, RequestMethod } from '../lib-httprex/types';
+import { serializeRequest } from '../lib-httprex/serializer';
+import type { ParsedRequest } from '../lib-httprex/types';
+
+const DEFAULT_RAW_TEXT = `GET https://api.example.com/users
+Accept: application/json
+`;
 
 export class RexRequestBlock extends LitElement {
   static styles = [
@@ -99,132 +103,168 @@ export class RexRequestBlock extends LitElement {
 
   @property({ type: String, reflect: true }) theme?: 'light' | 'dark';
 
-  @state() private _method: RexHttpMethod = 'GET';
-  @state() private _url = 'https://api.example.com/users';
+  /** The raw HTTP text — single source of truth */
+  @state() private _rawText = DEFAULT_RAW_TEXT;
+
+  /** Parsed request derived from _rawText */
+  @state() private _parsed: ParsedRequest | null = null;
+
   @state() private _view: 'ui' | 'code' = 'ui';
   @state() private _loading = false;
-
-  /** Current headers from the header editor */
-  private _headers: RexKeyValueItem[] = [
-    { id: 'default-accept', enabled: true, key: 'Accept', value: 'application/json' }
-  ];
-
-  /** Current query params from the param editor */
-  private _params: RexKeyValueItem[] = [];
-
-  /** Current body from the body editor */
-  private _body = '';
 
   @query('rex-response-panel')
   private _responsePanel!: RexResponsePanel;
 
+  connectedCallback() {
+    super.connectedCallback();
+    this._reparse();
+  }
+
+  /**
+   * Re-parse the raw text and update the derived state.
+   * This is the ONLY place ParsedRequest is created.
+   */
+  private _reparse() {
+    const result = HttpRex.parse(this._rawText);
+    this._parsed = result.success ? result.data : null;
+  }
+
+  /**
+   * Update the raw text and re-parse.
+   * All state changes flow through here.
+   */
+  private _updateRawText(text: string) {
+    this._rawText = text;
+    this._reparse();
+  }
+
+  // ── UI → raw text ──────────────────────────────────────────────
+
   private _onUrlBarChange(e: CustomEvent<{ method: RexHttpMethod; url: string }>) {
-    this._method = e.detail?.method ?? 'GET';
-    this._url = e.detail?.url ?? '';
+    const method = e.detail?.method ?? this._parsed?.method ?? 'GET';
+    const url = e.detail?.url ?? this._parsed?.url ?? '';
+    this._rebuildFromUI({ method, url });
   }
 
   private _onHeaderChange(e: CustomEvent<{ items: RexKeyValueItem[] }>) {
-    this._headers = e.detail?.items ?? [];
+    this._rebuildFromUI({ headers: e.detail?.items });
   }
 
   private _onParamChange(e: CustomEvent<{ items: RexKeyValueItem[] }>) {
-    this._params = e.detail?.items ?? [];
+    this._rebuildFromUI({ params: e.detail?.items });
   }
 
   private _onBodyInput(e: CustomEvent<{ value: string }>) {
-    this._body = e.detail?.value ?? '';
+    this._rebuildFromUI({ body: e.detail?.value });
   }
 
   /**
-   * Build a URL with query parameters appended
+   * Rebuild raw text from UI changes. Takes a partial update and merges
+   * with current parsed state, then serializes back to text.
    */
-  private _buildUrlWithParams(): string {
-    const enabledParams = this._params.filter(p => p.enabled && p.key);
-    if (enabledParams.length === 0) return this._url;
+  private _rebuildFromUI(patch: {
+    method?: string;
+    url?: string;
+    headers?: RexKeyValueItem[];
+    params?: RexKeyValueItem[];
+    body?: string;
+  }) {
+    const method = patch.method ?? this._parsed?.method ?? 'GET';
+    let url = patch.url ?? this._parsed?.url ?? '';
 
-    try {
-      const url = new URL(this._url);
-      for (const param of enabledParams) {
-        url.searchParams.append(param.key, param.value);
+    // Merge params into URL
+    const params = patch.params ?? this._extractParams();
+    const enabledParams = params.filter(p => p.enabled && p.key);
+    if (enabledParams.length > 0) {
+      try {
+        const urlObj = new URL(url.includes('://') ? url : `https://${url}`);
+        // Clear existing params from parsed URL if we're managing them
+        urlObj.search = '';
+        for (const p of enabledParams) {
+          urlObj.searchParams.append(p.key, p.value);
+        }
+        url = urlObj.toString();
+      } catch {
+        const qs = enabledParams
+          .map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
+          .join('&');
+        const sep = url.includes('?') ? '&' : '?';
+        url = `${url}${sep}${qs}`;
       }
-      return url.toString();
-    } catch {
-      // If URL is invalid, just append as query string
-      const qs = enabledParams
-        .map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
-        .join('&');
-      const sep = this._url.includes('?') ? '&' : '?';
-      return `${this._url}${sep}${qs}`;
     }
-  }
 
-  /**
-   * Build enabled headers as a Record<string, string>
-   */
-  private _buildHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {};
-    for (const h of this._headers) {
-      if (h.enabled && h.key) {
-        headers[h.key] = h.value;
-      }
-    }
-    return headers;
-  }
+    // Build headers from UI items
+    const headers = patch.headers ?? this._extractHeaders();
+    const enabledHeaders = headers
+      .filter(h => h.enabled && h.key)
+      .map(h => ({ key: h.key, value: h.value }));
 
-  /**
-   * Build a ParsedRequest from the current UI state
-   */
-  private _buildParsedRequest(): ParsedRequest {
-    const url = this._buildUrlWithParams();
-    const headers = this._buildHeaders();
-    const method = this._method as RequestMethod;
+    const body = patch.body ?? this._parsed?.body ?? undefined;
     const hasBody = !['GET', 'HEAD'].includes(method);
-    const body = hasBody && this._body.trim() ? this._body.trim() : undefined;
+    const bodyStr = hasBody && typeof body === 'string' && body.trim() ? body.trim() : undefined;
 
-    // Build raw lines for the preview
-    const headerLines = Object.entries(headers).map(([k, v]) => `${k}: ${v}`);
-    const bodyLines = body ? body.split('\n') : [];
-
-    return {
+    const text = serializeRequest({
       method,
       url,
-      headers,
-      body: body ?? null,
-      variables: [],
-      raw: {
-        requestLine: `${method} ${url}`,
-        headerLines,
-        bodyLines,
-      }
-    };
+      headers: enabledHeaders,
+      body: bodyStr,
+    });
+
+    this._updateRawText(text);
   }
 
   /**
-   * Build a raw request string for the code view
+   * Extract current headers as RexKeyValueItem[] from parsed state.
    */
-  private _buildRawRequestString(): string {
-    const request = this._buildParsedRequest();
-    return createRequestPreview(request);
+  private _extractHeaders(): RexKeyValueItem[] {
+    if (!this._parsed?.headers) return [];
+    return Object.entries(this._parsed.headers).map(([key, value], i) => ({
+      id: `hdr-${i}`,
+      enabled: true,
+      key,
+      value,
+    }));
   }
 
-  private async _onSend(_e: CustomEvent<{ method: RexHttpMethod; url: string }>) {
-    if (this._loading) return;
+  /**
+   * Extract query params from the current parsed URL as RexKeyValueItem[].
+   */
+  private _extractParams(): RexKeyValueItem[] {
+    if (!this._parsed?.url) return [];
+    try {
+      const url = new URL(this._parsed.url);
+      const params: RexKeyValueItem[] = [];
+      url.searchParams.forEach((value, key) => {
+        params.push({ id: `param-${params.length}`, enabled: true, key, value });
+      });
+      return params;
+    } catch {
+      return [];
+    }
+  }
 
-    const request = this._buildParsedRequest();
+  // ── Code view → raw text ───────────────────────────────────────
 
-    // Set loading state
+  private _onCodeChange(e: CustomEvent<{ value: string }>) {
+    this._updateRawText(e.detail?.value ?? '');
+  }
+
+  // ── Execution ──────────────────────────────────────────────────
+
+  private async _onSend() {
+    if (this._loading || !this._parsed) return;
+
     this._loading = true;
     this._responsePanel?.setLoading();
 
-    // Dispatch event so consumers can listen
     this.dispatchEvent(new CustomEvent('rex-send', {
-      detail: { method: this._method, url: this._url, request },
+      detail: { request: this._parsed },
       bubbles: true,
       composed: true,
     }));
 
     try {
-      const result = await HttpRex.execute(request);
+      const result = await HttpRex.execute(this._parsed);
 
       if (result.response) {
         this._responsePanel?.setResponse(result.response);
@@ -245,7 +285,11 @@ export class RexRequestBlock extends LitElement {
 
   render() {
     const theme = this.theme ?? nothing;
-    const raw = this._buildRawRequestString();
+    const method = (this._parsed?.method ?? 'GET') as RexHttpMethod;
+    const url = this._parsed?.url ?? '';
+    const headers = this._extractHeaders();
+    const params = this._extractParams();
+    const body = typeof this._parsed?.body === 'string' ? this._parsed.body : '';
 
     return html`
       <div class="frame">
@@ -273,8 +317,8 @@ export class RexRequestBlock extends LitElement {
         <div class="stack">
           ${this._view === 'ui' ? html`
             <rex-url-bar
-              .method=${this._method}
-              .url=${this._url}
+              .method=${method}
+              .url=${url}
               ?disabled=${this._loading}
               @rex-change=${this._onUrlBarChange}
               @rex-send=${this._onSend}
@@ -284,6 +328,9 @@ export class RexRequestBlock extends LitElement {
             <div class="two">
               <rex-request-panel
                 theme=${theme}
+                .headers=${headers}
+                .params=${params}
+                .body=${body}
                 @rex-header-change=${this._onHeaderChange}
                 @rex-param-change=${this._onParamChange}
                 @rex-body-input=${this._onBodyInput}
@@ -291,7 +338,13 @@ export class RexRequestBlock extends LitElement {
               <rex-response-panel theme=${theme}></rex-response-panel>
             </div>
           ` : html`
-            <rex-code-preview .value=${raw} theme=${theme} title="Raw request"></rex-code-preview>
+            <rex-code-preview
+              .value=${this._rawText}
+              editable
+              theme=${theme}
+              title="Raw request"
+              @rex-code-change=${this._onCodeChange}
+            ></rex-code-preview>
           `}
         </div>
       </div>
