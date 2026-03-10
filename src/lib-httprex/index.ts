@@ -237,7 +237,8 @@ export type {
 
 // Export submodules
 export { HttpParser, httpParser } from './parser';
-export { executeRequest, toCurl, createRequestPreview } from './executor';
+export { executeRequest, toCurl, createRequestPreview, serializeRequest } from './executor';
+export type { SerializeRequestParts } from './executor';
 export { VariableResolver, variableResolver } from './variables';
 export type { VariableStorage } from './variables/storage';
 export {
