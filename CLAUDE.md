@@ -110,6 +110,35 @@ Vite with multiple configs:
 - `vite.lib.min.config.ts` — Minified library bundle
 - `vite.lib.web-components.config.ts` — Web components bundle
 
+## Design Principle: Code-First
+
+**The raw HTTP code is the single source of truth. The UI is a visual editor for that code.**
+
+This is a hard rule for all development on HttpRex:
+
+1. **`rex-request-block` stores the raw HTTP text as its primary state** (a string like `GET https://api.example.com\nAccept: application/json`).
+2. **UI changes update the raw text**, which is then re-parsed via `HttpRex.parse()` to produce a `ParsedRequest`. The UI is populated from the parse result.
+3. **Code view edits** directly modify the raw text, which is re-parsed, and the UI updates to reflect.
+4. **Execution always goes through the parser**: raw text → `parse()` → `ParsedRequest` → `execute()`. Components must NEVER build `ParsedRequest` objects manually.
+5. **Every feature must have equivalent HTTP syntax.** If something can be configured in the UI but has no representation in the raw text, it is a bug.
+6. **Use `ParsedRequest.raw` fields** (requestLine, headerLines, bodyLines) to preserve `{{variables}}` and original formatting. Never use `createRequestPreview()` for the source text — it resolves variables and loses the original.
+
+### Data Flow
+
+```
+Raw HTTP text (source of truth, stored in rex-request-block)
+  ↓ (on any change)
+HttpRex.parse(text) → ParsedRequest
+  ↓
+UI components reflect ParsedRequest (method, url, headers, params, body)
+  ↓ (user edits UI)
+Component generates updated raw text → back to top
+  ↓ (user clicks Send)
+ParsedRequest → HttpRex.execute() → response
+```
+
+This mirrors how tools like Mermaid.js work: the text is the source, the visual rendering is derived from it.
+
 ## Development Notes
 
 ### Adding Support for New Platforms
